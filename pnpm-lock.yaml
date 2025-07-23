@@ -4,6 +4,19 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    typescript:
+      specifier: ^5.8.3
+      version: 5.8.3
+  effect:
+    '@effect/rpc':
+      specifier: ~0.68.0
+      version: 0.68.0
+    effect:
+      specifier: ^3.17.1
+      version: 3.17.1
+
 importers:
 
   .:
@@ -15,10 +28,10 @@ importers:
   examples/nextjs:
     dependencies:
       '@effect/rpc':
-        specifier: ~0.68.0
+        specifier: catalog:effect
         version: 0.68.0(@effect/platform@0.90.0(effect@3.17.1))(effect@3.17.1)
       effect:
-        specifier: 3.17.1
+        specifier: catalog:effect
         version: 3.17.1
       effect-rpc:
         specifier: workspace:*
@@ -58,7 +71,7 @@ importers:
         specifier: ^4
         version: 4.1.11
       typescript:
-        specifier: ^5
+        specifier: 'catalog:'
         version: 5.8.3
 
   examples/tanstack-start:
@@ -116,7 +129,7 @@ importers:
         specifier: ^3.4.17
         version: 3.4.17
       typescript:
-        specifier: ^5.7.2
+        specifier: 'catalog:'
         version: 5.8.3
       vite:
         specifier: ^6.3.5
@@ -216,13 +229,13 @@ importers:
         specifier: ^0.90.0
         version: 0.90.0(effect@3.17.1)
       '@effect/rpc':
-        specifier: ~0.68.0
+        specifier: catalog:effect
         version: 0.68.0(@effect/platform@0.90.0(effect@3.17.1))(effect@3.17.1)
       effect:
-        specifier: ^3.17.1
+        specifier: catalog:effect
         version: 3.17.1
       typescript:
-        specifier: ^5.8.3
+        specifier: 'catalog:'
         version: 5.8.3
     devDependencies:
       '@effect/language-service':

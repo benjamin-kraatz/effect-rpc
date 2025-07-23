@@ -10,15 +10,15 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@effect/rpc": "~0.68.0",
-    "effect": "3.17.1",
+    "@effect/rpc": "catalog:effect",
+    "effect": "catalog:effect",
     "effect-rpc": "workspace:*",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "next": "15.4.3"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "typescript": "catalog:",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
