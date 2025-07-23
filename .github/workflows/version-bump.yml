@@ -1,0 +1,65 @@
+name: Version Bump
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  version-bump:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    
+    # Only run on merged PRs or direct pushes to main
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+      - name: Install get-next-version
+        run: |
+          curl -L -o get-next-version https://github.com/thenativeweb/get-next-version/releases/latest/download/get-next-version-linux-amd64
+          chmod +x get-next-version
+          sudo mv get-next-version /usr/local/bin/
+          
+      - name: Get next version and bump
+        id: get_next_version
+        uses: thenativeweb/get-next-version@main
+        with:
+          prefix: ''
+
+      - name: Create release
+        if: steps.get_next_version.outputs.hasNextVersion == 'true'
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ steps.get_next_version.outputs.version }}
+          release_name: Release v${{ steps.get_next_version.outputs.version }}
+          body: |
+            Automated release v${{ steps.get_next_version.outputs.version }}
+            
+            This release was created automatically by the version bump workflow.
+          draft: false
+          prerelease: false
