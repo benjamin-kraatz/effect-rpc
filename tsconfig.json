@@ -34,5 +34,5 @@
       }
     ]
   },
-  "exclude": ["examples/**", "dist/**"]
+  "exclude": ["examples/**", "docs/**", "dist/**"]
 }
