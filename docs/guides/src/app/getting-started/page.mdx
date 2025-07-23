@@ -1,0 +1,191 @@
+import { CodeBlock } from '@/components/CodeBlock';
+
+# Getting Started: Your First Epic Effect RPC Adventure
+
+Alright, my friend, it's time to embark on an epic adventure. We're going to build our very first Effect RPC application. It's going to be a simple "todo" application, but don't let that fool you. This is where the magic happens. This is where you'll learn the fundamentals of Effect RPC, and this is where you'll lay the foundation for all of your future Effect RPC projects. By the end of this guide, you'll have a solid understanding of how Effect RPC works, and you'll be ready to start building your own amazing applications.
+
+## Your trusty steed and supplies
+
+Before we set off on our grand adventure, we need to make sure we have all the necessary supplies. Every hero needs a trusty steed, and for us, that's Node.js and pnpm.
+
+*   **Node.js (version 18 or higher):** This is the engine that will power our application. It's the wind in our sails, the fire in our hearts. If you don't have it installed, you can download it from the [official Node.js website](https://nodejs.org/). Don't worry, it's a quick and easy process.
+*   **pnpm:** This is a fast and efficient package manager for Node.js. It's our trusty pack mule, carrying all of our dependencies for us. If you don't have it installed, you can install it by running `npm install -g pnpm`. It's a small command, but it will make a big difference in your development workflow.
+
+Got everything? Fantastic! Let's get this show on the road.
+
+## Your first quest: Forging the project
+
+Our first quest is to forge our project in the fires of Mount Doom. Okay, maybe not Mount Doom, but we are going to use the TanStack Start template, which is pretty darn hot. It's a fantastic starting point for any new web application, and it comes with a whole bunch of goodies, including a Vite-based development server, a file-based router, and a pre-configured build process. It's like having a master blacksmith forge your project for you.
+
+To create a new project, open up your terminal and run the following command:
+
+<CodeBlock language="bash">{`pnpm create vite@latest my-app --template @tanstack/start
+`}</CodeBlock>
+
+This will create a new directory called `my-app` with a basic project structure. Now, let's navigate into our new project and install the dependencies. This is like enchanting our project with powerful spells.
+
+<CodeBlock language="bash">{`cd my-app
+pnpm install
+`}</CodeBlock>
+
+And that's it! Our project is forged, enchanted, and ready for battle. See? I told you this was going to be an epic adventure.
+
+## The heart of the dragon: Defining the API
+
+Now for the most important part of our quest. We're going to define the API for our todo application. This is the heart of the dragon, the source of all our power. With Effect RPC, you define your API as a simple TypeScript interface. This interface is the single source of truth for your entire application, and it's what makes Effect RPC so powerful and easy to use.
+
+Let's create a new file called `src/api.ts` and add the following code:
+
+<code>
+<CodeBlock language="typescript">{`import { z } from 'zod'
+
+export const api = {
+  getTodo: {
+    input: z.object({ id: z.number() }),
+    output: z.object({
+      id: z.number(),
+      title: z.string(),
+      completed: z.boolean(),
+    }),
+  },
+  createTodo: {
+    input: z.object({ title: z.string() }),
+    output: z.object({
+      id: z.number(),
+      title: z.string(),
+      completed: z.boolean(),
+    }),
+  },
+}`}</CodeBlock>
+</code>
+
+So, what's going on here? We're using a library called [Zod](https://github.com/colinhacks/zod) to define the input and output schemas for our API methods. Zod is like a powerful sorcerer that guards our API. It makes sure that all the data that comes in and out of our API is valid, and it casts a powerful spell of protection over our application. This is what gives us our type-safety superpower.
+
+We've defined two API methods: `getTodo` and `createTodo`. The `getTodo` method takes an `id` as input and returns a todo object. The `createTodo` method takes a `title` as input and returns a new todo object.
+
+> **A tale from the trenches:** I remember a time when I was working on a project without Zod. It was a dark and stormy night, and our application was crashing left and right. We were getting all sorts of weird errors, and we couldn't figure out why. It turned out that we were passing invalid data to our API, and it was causing all sorts of problems. We spent days trying to track down the bugs, and it was a nightmare. Then, we discovered Zod. We added it to our project, and it was like a ray of sunshine on a cloudy day. It caught all of our invalid data at the source, and it saved us from countless hours of debugging. I've been a Zod believer ever since.
+
+## The engine of creation: Building the server
+
+Now that we have our API defined, it's time to build a server to implement it. The server is the engine of creation, the forge where our application comes to life.
+
+Let's create a new file called `src/server.ts` and add the following code:
+
+<CodeBlock language="typescript">{`import { createServer } from 'effect-rpc'
+import { api } from './api'
+
+const app = createServer({
+  api,
+  router: {
+    getTodo: async ({ input }) => {
+      // In a real application, you would fetch this from a magical database in the cloud
+      return {
+        id: input.id,
+        title: 'Conquer the world with Effect RPC',
+        completed: false,
+      }
+    },
+    createTodo: async ({ input }) => {
+      // In a real application, you would save this to your legendary database
+      return {
+        id: Math.floor(Math.random() * 1000),
+        title: input.title,
+        completed: false,
+      }
+    },
+  },
+})
+
+app.listen(3000, () => {
+  console.log('🔥 Server is blazing on http://localhost:3000')
+})`}</CodeBlock>
+
+Here, we're using the `createServer` function from the `effect-rpc` package to create a new server. We're passing our API definition and a router that implements the API methods. The router is just a plain old JavaScript object where the keys are the names of our API methods and the values are the functions that implement them.
+
+For now, we're just returning some dummy data. In a real application, you would fetch this data from a database. But for now, this will do just fine. We're just getting our feet wet.
+
+## The crystal ball: Creating the client
+
+With our server up and running, it's time to create a client to consume our API. The client is our crystal ball, allowing us to see into the future and interact with our application.
+
+Let's create a new file called `src/client.ts` and add the following code:
+
+<CodeBlock language="typescript">{`import { createClient } from 'effect-rpc'
+import { api } from './api'
+
+export const client = createClient<typeof api>({
+  transport: {
+    url: 'http://localhost:3000',
+  },
+})`}</CodeBlock>
+
+Here, we're using the `createClient` function from the `effect-rpc` package to create a new client. We're passing our API definition and a transport that specifies the URL of our server. The transport is what handles the communication between the client and the server. It's like a magical messenger owl, carrying our requests and responses back and forth.
+
+And that's it! Our client is all set up. Now, let's use it to call our API.
+
+## The final incantation: Using the client
+
+Now for the final incantation. Let's use our client to call our API and display the data in our application.
+
+Open up the `src/routes/index.tsx` file and replace the existing code with the following:
+
+<CodeBlock language="typescript">{`import * as React from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { client } from '../client'
+import { api } from '../api'
+
+export const Route = createFileRoute('/')({
+  component: Index,
+})
+
+function Index() {
+  const [todo, setTodo] = React.useState<api['getTodo']['output'] | null>(null)
+
+  React.useEffect(() => {
+    client.getTodo({ id: 1 }).then(setTodo)
+  }, [])
+
+  return (
+    <div className="p-2">
+      <h3 className="text-2xl font-bold">My Epic Todo</h3>
+      {todo ? (
+        <div className="mt-4">
+          <p className="text-lg">
+            {todo.title} - {todo.completed ? 'Conquered!' : 'On the list...'}
+          </p>
+        </div>
+      ) : (
+        <p>Gazing into the crystal ball...</p>
+      )}
+    </div>
+  )
+}
+`}</CodeBlock>
+
+Here, we're using the `client.getTodo` method to fetch a todo from our server. We're then displaying the todo in our component. We're also using the `api` object to get the type of the todo object, which gives us some nice type safety in our component. It's like having a magical spell checker for our code.
+
+## The moment of truth: Running the application
+
+Alright, it's time for the moment of truth. To run our application, we need to start both the server and the development server.
+
+**Start the server:**
+
+Open up a new terminal window and run the following command:
+
+<CodeBlock language="bash">{`pnpm tsx src/server.ts
+`}</CodeBlock>
+
+**Start the development server:**
+
+In your other terminal window, run the following command:
+
+<CodeBlock language="bash">{`pnpm dev
+`}</CodeBlock>
+
+Now, open up your browser and navigate to `http://localhost:5173`. You should see your epic todo application in all its glory.
+
+## What's next on our quest?
+
+Congratulations, my friend! You've just completed your first epic Effect RPC adventure. You've learned how to define an API, create a server, create a client, and use the client to call your API. You're well on your way to becoming an Effect RPC legend.
+
+Now that you've got the basics down, you're ready to continue your quest. In the next section, we'll take a closer look at the core concepts of the library. So, grab a potion of healing, and let's continue our adventure. The world of Effect RPC awaits!
