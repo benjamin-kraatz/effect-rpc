@@ -16,7 +16,8 @@ export function GreetUserButton() {
           Effect.succeed(`Error in SayHello: ${error.message}`),
       })
     );
-    alert(greetPhraseProgram);
+    const greetPhrase = await AppRuntime.runPromise(greetPhraseProgram);
+    alert(greetPhrase);
   };
 
   return <button onClick={greet}>Greet me!</button>;

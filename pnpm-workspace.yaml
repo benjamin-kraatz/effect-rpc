@@ -1,0 +1,11 @@
+packages:
+  - packages/**
+  - examples/**
+
+catalog:
+  typescript: "^5.8.3"
+
+catalogs:
+  effect:
+    "effect": "^3.17.1"
+    "@effect/rpc": "~0.68.0"
