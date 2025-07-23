@@ -17,13 +17,16 @@
     }
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "docs:gen": "typedoc --out docs/public --router kind-dir --entryPointStrategy expand src --skipErrorChecking --exclude \"**/*.test.ts\"",
+    "docs:deploy": "cd docs && flyctl deploy"
   },
   "dependencies": {
     "@effect/platform": "^0.90.0"
   },
   "devDependencies": {
-    "@effect/language-service": "^0.28.2"
+    "@effect/language-service": "^0.28.2",
+    "typedoc": "^0.28.7"
   },
   "peerDependencies": {
     "@effect/rpc": "~0.68.0",

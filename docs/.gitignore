@@ -1,0 +1,2 @@
+# Don't directly include the docs as they can easily be re-generated.
+public/**
