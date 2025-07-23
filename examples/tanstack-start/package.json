@@ -1,5 +1,5 @@
 {
-  "name": "tanstack-start-example-basic-react-query",
+  "name": "@effect-rpc/example-tanstack-start",
   "private": true,
   "sideEffects": false,
   "type": "module",
