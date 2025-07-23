@@ -202,36 +202,32 @@ export function createRPCHandler<
 }
 
 /**
- * Creates a server-side handler for a specific RPC request within a given RPC group.
+ * Creates a server-side handler for a specific RPC request within a given RPC group,
+ * immediately invoking the RPC endpoint with the provided payload and returning the result Effect.
  *
  * @template T - The type representing the RPC group.
  * @template K - The key of the RPC method within the group.
  *
  * @param rpcGroup - The RPC group containing the available RPC methods.
  * @param requestName - The name of the RPC method to handle.
- * @returns A promise that resolves to a function. This function takes the payload for the specified RPC method
- *          and returns the result of invoking that method.
+ * @param payload - The payload to send to the specified RPC method.
+ * @returns The Effect returned by invoking the RPC endpoint with the given payload.
  *
  * @remarks
  * This utility is intended for server-side usage to facilitate handling of typed RPC requests.
- * The returned function enforces the correct payload and return types based on the RPC group definition.
- * It wraps the same client as {@link useRPCRequest}.
+ * The returned Effect enforces the correct payload and return types based on the RPC group definition.
+ * It wraps the same client as {@link useRPCRequest}, but immediately invokes the endpoint with the payload.
  *
  * @example
  * ```typescript
- * const getUser = await makeServerRequest(userRpcGroup, "getUser");
- * const user = await getUser({ id: "123" });
- * // user is the response from the getUser RPC method.
+ * const userEffect = makeServerRequest(userRpcGroup, "getUser", { id: "123" });
+ * // userEffect is an Effect representing the result of the getUser RPC method.
  * ```
  */
 export function makeServerRequest<
   T extends RpcGroup.RpcGroup<any>,
   K extends keyof InferClient<T>
->(
-  rpcGroup: T,
-  requestName: K
-): (
-  payload: Parameters<InferClient<T>[K]>[0]
-) => ReturnType<InferClient<T>[K]> {
-  return getRPCClient(rpcGroup, requestName);
+>(rpcGroup: T, requestName: K, payload: Parameters<InferClient<T>[K]>[0]) {
+  const request = getRPCClient(rpcGroup, requestName);
+  return request(payload);
 }
