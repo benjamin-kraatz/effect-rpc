@@ -12,9 +12,11 @@
   "dependencies": {
     "@mdx-js/react": "^3.1.0",
     "@mdx-js/rollup": "^3.1.0",
+    "@tailwindcss/vite": "^4.1.11",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-syntax-highlighter": "^15.6.1",
+    "tailwindcss": "^4.1.11",
     "vite-plugin-mdx": "^3.6.1"
   },
   "devDependencies": {

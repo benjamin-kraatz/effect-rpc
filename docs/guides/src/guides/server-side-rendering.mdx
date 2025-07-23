@@ -1,3 +1,5 @@
+import { CodeBlock } from '../components/CodeBlock';
+
 # Server-side Rendering: The Best of Both Worlds
 
 Welcome back, wise architect! You've learned how to build applications that are fast, scalable, real-time, and that allow users to upload their own files. But what if you want to take your applications to the next level? What if you want to build applications that are not only powerful and feature-rich, but also blazingly fast and SEO-friendly? Well, my friend, you've come to the right place. In this section, we're going to learn how to do server-side rendering (SSR) with RPC-Less.
@@ -21,8 +23,7 @@ With RPC-Less, you can do server-side rendering with any framework you want. How
 
 Here's an example of how to do server-side rendering with RPC-Less and Next.js:
 
-```tsx
-// pages/index.tsx
+<CodeBlock language="typescript">{`// pages/index.tsx
 import { GetServerSideProps } from 'next'
 import { client } from '../client'
 import { api } from '../api'
@@ -48,7 +49,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     },
   }
 }
-```
+`}</CodeBlock>
 
 In this example, we're using the `getServerSideProps` function from Next.js to fetch the data on the server. We're then passing the data to our component as props. The component is then rendered on the server, and the fully rendered HTML is sent to the client.
 

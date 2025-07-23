@@ -1,3 +1,5 @@
+import { CodeBlock } from '../components/CodeBlock';
+
 # Getting Started: Your First Epic RPC-Less Adventure
 
 Alright, my friend, it's time to embark on an epic adventure. We're going to build our very first RPC-Less application. It's going to be a simple "todo" application, but don't let that fool you. This is where the magic happens. This is where you'll learn the fundamentals of RPC-Less, and this is where you'll lay the foundation for all of your future RPC-Less projects. By the end of this guide, you'll have a solid understanding of how RPC-Less works, and you'll be ready to start building your own amazing applications.
@@ -17,16 +19,14 @@ Our first quest is to forge our project in the fires of Mount Doom. Okay, maybe 
 
 To create a new project, open up your terminal and run the following command:
 
-```bash
-pnpm create vite@latest my-app --template @tanstack/start
-```
+<CodeBlock language="bash">{`pnpm create vite@latest my-app --template @tanstack/start
+`}</CodeBlock>
 
 This will create a new directory called `my-app` with a basic project structure. Now, let's navigate into our new project and install the dependencies. This is like enchanting our project with powerful spells.
 
-```bash
-cd my-app
+<CodeBlock language="bash">{`cd my-app
 pnpm install
-```
+`}</CodeBlock>
 
 And that's it! Our project is forged, enchanted, and ready for battle. See? I told you this was going to be an epic adventure.
 
@@ -36,8 +36,8 @@ Now for the most important part of our quest. We're going to define the API for 
 
 Let's create a new file called `src/api.ts` and add the following code:
 
-```ts
-import { z } from 'zod'
+<code>
+<CodeBlock language="typescript">{`import { z } from 'zod'
 
 export const api = {
   getTodo: {
@@ -56,8 +56,8 @@ export const api = {
       completed: z.boolean(),
     }),
   },
-}
-```
+}`}</CodeBlock>
+</code>
 
 So, what's going on here? We're using a library called [Zod](https://github.com/colinhacks/zod) to define the input and output schemas for our API methods. Zod is like a powerful sorcerer that guards our API. It makes sure that all the data that comes in and out of our API is valid, and it casts a powerful spell of protection over our application. This is what gives us our type-safety superpower.
 
@@ -71,8 +71,7 @@ Now that we have our API defined, it's time to build a server to implement it. T
 
 Let's create a new file called `src/server.ts` and add the following code:
 
-```ts
-import { createServer } from '@rpc-less/server'
+<CodeBlock language="typescript">{`import { createServer } from '@rpc-less/server'
 import { api } from './api'
 
 const app = createServer({
@@ -99,8 +98,7 @@ const app = createServer({
 
 app.listen(3000, () => {
   console.log('🔥 Server is blazing on http://localhost:3000')
-})
-```
+})`}</CodeBlock>
 
 Here, we're using the `createServer` function from the `@rpc-less/server` package to create a new server. We're passing our API definition and a router that implements the API methods. The router is just a plain old JavaScript object where the keys are the names of our API methods and the values are the functions that implement them.
 
@@ -112,16 +110,14 @@ With our server up and running, it's time to create a client to consume our API.
 
 Let's create a new file called `src/client.ts` and add the following code:
 
-```ts
-import { createClient } from '@rpc-less/client'
+<CodeBlock language="typescript">{`import { createClient } from '@rpc-less/client'
 import { api } from './api'
 
 export const client = createClient<typeof api>({
   transport: {
     url: 'http://localhost:3000',
   },
-})
-```
+})`}</CodeBlock>
 
 Here, we're using the `createClient` function from the `@rpc-less/client` package to create a new client. We're passing our API definition and a transport that specifies the URL of our server. The transport is what handles the communication between the client and the server. It's like a magical messenger owl, carrying our requests and responses back and forth.
 
@@ -133,8 +129,7 @@ Now for the final incantation. Let's use our client to call our API and display 
 
 Open up the `src/routes/index.tsx` file and replace the existing code with the following:
 
-```tsx
-import * as React from 'react'
+<CodeBlock language="typescript">{`import * as React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { client } from '../client'
 import { api } from '../api'
@@ -165,7 +160,7 @@ function Index() {
     </div>
   )
 }
-```
+`}</CodeBlock>
 
 Here, we're using the `client.getTodo` method to fetch a todo from our server. We're then displaying the todo in our component. We're also using the `api` object to get the type of the todo object, which gives us some nice type safety in our component. It's like having a magical spell checker for our code.
 
@@ -177,17 +172,15 @@ Alright, it's time for the moment of truth. To run our application, we need to s
 
 Open up a new terminal window and run the following command:
 
-```bash
-pnpm tsx src/server.ts
-```
+<CodeBlock language="bash">{`pnpm tsx src/server.ts
+`}</CodeBlock>
 
 **Start the development server:**
 
 In your other terminal window, run the following command:
 
-```bash
-pnpm dev
-```
+<CodeBlock language="bash">{`pnpm dev
+`}</CodeBlock>
 
 Now, open up your browser and navigate to `http://localhost:5173`. You should see your epic todo application in all its glory.
 

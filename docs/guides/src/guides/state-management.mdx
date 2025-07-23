@@ -1,3 +1,5 @@
+import { CodeBlock } from '../components/CodeBlock';
+
 # State Management: Taming the State Monster
 
 Welcome back, my friend! In this section, we're going to talk about state management. State management is one of the most challenging parts of building a web application. It's like trying to tame a wild beast. But don't worry, with RPC-Less and Zustand, we can tame the state monster together.
@@ -22,8 +24,7 @@ With Zustand, you create a store to hold your state. A store is just a plain old
 
 Let's create a store for our todo application. Create a new file called `src/store.ts` and add the following code:
 
-```ts
-import { create } from 'zustand'
+<CodeBlock language="typescript">{`import { create } from 'zustand'
 import { client } from './client'
 import { api } from './api'
 
@@ -43,7 +44,7 @@ export const useStore = create<Store>((set) => ({
     set({ todos })
   },
 }))
-```
+`}</CodeBlock>
 
 In this example, we're creating a store with an initial state that contains an empty array of todos. We're also defining two actions: `addTodo` and `fetchTodos`. The `addTodo` action adds a new todo to the store, and the `fetchTodos` action fetches the todos from the server and updates the store.
 
@@ -51,8 +52,7 @@ In this example, we're creating a store with an initial state that contains an e
 
 To use the store in your components, you use the `useStore` hook.
 
-```tsx
-import { useStore } from '../store'
+<CodeBlock language="typescript">{`import { useStore } from '../store'
 
 function MyComponent() {
   const todos = useStore((state) => state.todos)
@@ -80,7 +80,7 @@ function MyComponent() {
     </div>
   )
 }
-```
+`}</CodeBlock>
 
 In this example, we're using the `useStore` hook to get the `todos`, `addTodo`, and `fetchTodos` from the store. We're then displaying the todos in a list and providing a button to add a new todo.
 

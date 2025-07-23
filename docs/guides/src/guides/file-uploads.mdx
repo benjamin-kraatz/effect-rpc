@@ -1,3 +1,5 @@
+import { CodeBlock } from '../components/CodeBlock';
+
 # File Uploads: Unleashing the Power of the User
 
 Welcome back, intrepid builder! You've learned how to build applications that are fast, scalable, and real-time. But what if you want to give your users the power to upload their own files? What if you want to build an application that allows users to upload their own photos, videos, or documents? Well, my friend, you've come to the right place. In this section, we're going to learn how to handle file uploads with RPC-Less.
@@ -14,7 +16,7 @@ To handle file uploads, we'll need to create a new API method on our server. Thi
 
 ### Creating the upload endpoint
 
-```ts
+<CodeBlock language="typescript">{`
 import { createServer } from '@rpc-less/server'
 import { api } from './api'
 import formidable from 'formidable';
@@ -43,7 +45,7 @@ const server = http.createServer((req, res) => {
 server.listen(3000, () => {
   console.log('🚀 Server is ready for uploads on http://localhost:3000')
 })
-```
+`}</CodeBlock>
 
 In this example, we're creating a new `uploadFile` method that uses formidable to parse the form data. We're then logging the path of the uploaded file to the console. In a real application, you would save the file to a cloud storage provider, like Amazon S3 or Google Cloud Storage.
 
@@ -53,7 +55,7 @@ To upload a file from the client, we'll need to create a form that allows the us
 
 ### Creating the upload form
 
-```tsx
+<CodeBlock language="typescript">{`
 import * as React from 'react'
 
 export function FileUpload() {
@@ -82,7 +84,7 @@ export function FileUpload() {
     </form>
   )
 }
-```
+`}</CodeBlock>
 
 In this example, we're creating a simple form that allows the user to select a file. When the user submits the form, we create a new `FormData` object and append the file to it. We then use the `fetch` API to send the form data to the server.
 

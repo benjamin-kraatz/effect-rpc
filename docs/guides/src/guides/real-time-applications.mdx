@@ -1,3 +1,5 @@
+import { CodeBlock } from '../components/CodeBlock';
+
 # Real-time Applications: Breathing Life into Your Creations
 
 Welcome back, master builder! You've learned how to build powerful and robust applications with RPC-Less. But what if you want to take your creations to the next level? What if you want to build applications that are alive, that breathe, that react to changes in real-time? Well, my friend, you've come to the right place. In this section, we're going to learn how to build real-time applications with RPC-Less.
@@ -22,8 +24,7 @@ There are many WebSocket servers available for Node.js, but our favorite is [ws]
 
 Here's an example of how to create a WebSocket server with `ws`:
 
-```ts
-import { WebSocketServer } from 'ws';
+<CodeBlock language="typescript">{`import { WebSocketServer } from 'ws';
 import { createServer } from '@rpc-less/server'
 import { api } from './api'
 
@@ -43,7 +44,7 @@ wss.on('connection', function connection(ws) {
     ws.send(JSON.stringify(result));
   });
 });
-```
+`}</CodeBlock>
 
 In this example, we're creating a WebSocket server that listens for connections on port 8080. When a client connects, we listen for messages. When we receive a message, we parse it, call the appropriate API method, and then send the result back to the client.
 
@@ -51,8 +52,7 @@ In this example, we're creating a WebSocket server that listens for connections 
 
 To connect to our WebSocket server, we'll need to use a WebSocket transport on the client. We can create a custom transport that uses the native WebSocket API.
 
-```ts
-import { createClient } from '@rpc-less/client'
+<CodeBlock language="typescript">{`import { createClient } from '@rpc-less/client'
 import { api } from './api'
 
 const customTransport = {
@@ -87,7 +87,7 @@ const customTransport = {
 export const client = createClient<typeof api>({
   transport: customTransport,
 })
-```
+`}</CodeBlock>
 
 ### Subscriptions
 
@@ -97,8 +97,7 @@ To create a real-time application, you'll need to use subscriptions. Subscriptio
 
 To create a subscription, you'll need to define a method on your API that returns a stream of data.
 
-```ts
-import { z } from 'zod'
+<CodeBlock language="typescript">{`import { z } from 'zod'
 import { observable } from '@trpc/server/observable';
 
 export const api = {
@@ -126,7 +125,7 @@ export const api = {
     }
   }
 }
-```
+`}</CodeBlock>
 
 In this example, we're defining a `onNewMessage` method that returns an observable. The observable emits a new message every second.
 
@@ -134,15 +133,14 @@ In this example, we're defining a `onNewMessage` method that returns an observab
 
 You can then subscribe to this method on the client.
 
-```tsx
-import { client } from '../client'
+<CodeBlock language="typescript">{`import { client } from '../client'
 
 client.onNewMessage.subscribe(undefined, {
   onData: (message) => {
     console.log(message)
   },
 })
-```
+`}</CodeBlock>
 
 In this example, we're subscribing to the `onNewMessage` method. Whenever a new message is received, we log it to the console.
 

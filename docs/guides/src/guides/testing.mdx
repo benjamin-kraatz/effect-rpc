@@ -1,3 +1,5 @@
+import { CodeBlock } from '../components/CodeBlock';
+
 # Testing: The Guardian Angel of Your Application
 
 Welcome back, my friend! In this section, we're going to talk about testing. Testing is like the guardian angel of your application. It watches over your code and makes sure that everything is working as it should. It's an essential part of building a robust and reliable application, and it's a skill that every developer should have.
@@ -26,15 +28,14 @@ Unit tests are the easiest type of test to write, and they're a great place to s
 
 Here's an example of how to unit test an API method using [Vitest](https://vitest.dev/):
 
-```ts
-import { expect, test } from 'vitest'
+<CodeBlock language="typescript">{`import { expect, test } from 'vitest'
 import { router } from '../router'
 
 test('getTodo should return a todo', async () => {
   const todo = await router.getTodo({ input: { id: 1 } })
   expect(todo).toEqual({ id: 1, title: 'Learn RPC-Less', completed: false })
 })
-```
+`}</CodeBlock>
 
 In this example, we're importing the router and then calling the `getTodo` method directly. We're then asserting that the method returns the expected output.
 
@@ -46,8 +47,7 @@ Integration tests are a bit more complex than unit tests, but they're still rela
 
 Here's an example of how to integration test your application using [Supertest](https://github.com/ladjs/supertest):
 
-```ts
-import { expect, test } from 'vitest'
+<CodeBlock language="typescript">{`import { expect, test } from 'vitest'
 import request from 'supertest'
 import { app } from '../server'
 
@@ -65,7 +65,7 @@ test('POST / should return a todo', async () => {
     completed: false,
   })
 })
-```
+`}</CodeBlock>
 
 In this example, we're using Supertest to send a request to the server and then asserting that the response is correct.
 
@@ -77,15 +77,14 @@ End-to-end tests are the most complex type of test to write, but they're also th
 
 Here's an example of how to end-to-end test your application using [Playwright](https://playwright.dev/):
 
-```ts
-import { expect, test } from '@playwright/test'
+<CodeBlock language="typescript">{`import { expect, test } from '@playwright/test'
 
 test('should display a todo', async ({ page }) => {
   await page.goto('http://localhost:5173')
   await expect(page.locator('h3')).toContainText('My Todo')
   await expect(page.locator('p')).toContainText('Learn RPC-Less - Pending')
 })
-```
+`}</CodeBlock>
 
 In this example, we're using Playwright to navigate to the application and then asserting that the page contains the expected content.
 
