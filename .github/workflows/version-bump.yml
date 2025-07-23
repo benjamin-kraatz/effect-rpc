@@ -57,6 +57,8 @@ jobs:
       - name: Create release
         if: steps.get_next_version.outputs.hasNextVersion == 'true'
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.get_next_version.outputs.version }}
           release_name: Release v${{ steps.get_next_version.outputs.version }}
