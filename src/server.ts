@@ -2,7 +2,7 @@
 import { RpcGroup, RpcServer } from "@effect/rpc";
 import type { Context } from "@effect/rpc/Rpc";
 import { Effect, Layer } from "effect";
-import type { InferClient } from "./helpers";
+import { getRPCClient, type InferClient } from "./helpers";
 import { getServerLayers } from "./runtime";
 
 /**
@@ -199,4 +199,39 @@ export function createRPCHandler<
     serviceLayers
   );
   return createServerHandler(router, routeHandlers, ...additionalLayers);
+}
+
+/**
+ * Creates a server-side handler for a specific RPC request within a given RPC group.
+ *
+ * @template T - The type representing the RPC group.
+ * @template K - The key of the RPC method within the group.
+ *
+ * @param rpcGroup - The RPC group containing the available RPC methods.
+ * @param requestName - The name of the RPC method to handle.
+ * @returns A promise that resolves to a function. This function takes the payload for the specified RPC method
+ *          and returns the result of invoking that method.
+ *
+ * @remarks
+ * This utility is intended for server-side usage to facilitate handling of typed RPC requests.
+ * The returned function enforces the correct payload and return types based on the RPC group definition.
+ * It wraps the same client as {@link useRPCRequest}.
+ *
+ * @example
+ * ```typescript
+ * const getUser = await makeServerRequest(userRpcGroup, "getUser");
+ * const user = await getUser({ id: "123" });
+ * // user is the response from the getUser RPC method.
+ * ```
+ */
+export function makeServerRequest<
+  T extends RpcGroup.RpcGroup<any>,
+  K extends keyof InferClient<T>
+>(
+  rpcGroup: T,
+  requestName: K
+): (
+  payload: Parameters<InferClient<T>[K]>[0]
+) => ReturnType<InferClient<T>[K]> {
+  return getRPCClient(rpcGroup, requestName);
 }

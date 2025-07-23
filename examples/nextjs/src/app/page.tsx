@@ -1,3 +1,4 @@
+import { greetUserServerSide } from "@/lib/server-funcs/actions";
 import Image from "next/image";
 import { GreetUserButton } from "./_components/hello";
 
@@ -52,6 +53,17 @@ export default function Home() {
           </a>
         </div>
         <GreetUserButton />
+        <div className="border rounded-lg p-2">
+          <form
+            action={async (fd) => {
+              "use server";
+              const greetPhrase = await greetUserServerSide("John Doe");
+              console.log(greetPhrase);
+            }}
+          >
+            <button type="submit">Greet User Server-Side</button>
+          </form>
+        </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a

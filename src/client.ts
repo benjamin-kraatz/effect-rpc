@@ -1,6 +1,5 @@
-import { RpcClient, RpcGroup } from "@effect/rpc";
-import { Effect } from "effect";
-import type { InferClient } from "./helpers";
+import { RpcGroup } from "@effect/rpc";
+import { getRPCClient, type InferClient } from "./helpers";
 
 /**
  * Creates a function to perform an RPC request using the provided RPC group and request name.
@@ -31,16 +30,11 @@ export function useRPCRequest<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends RpcGroup.RpcGroup<any>,
   K extends keyof InferClient<T>
->(rpcGroup: T, requestName: K) {
-  return (payload: Parameters<InferClient<T>[K]>[0]) => {
-    const program = Effect.gen(function* () {
-      const client = yield* RpcClient.make(rpcGroup);
-      const req = client[requestName];
-      const res = yield* req(payload);
-      yield* Effect.log(`Response from ${String(requestName)}:`, res);
-      return res;
-    }).pipe(Effect.scoped) as ReturnType<InferClient<T>[K]>;
-
-    return program;
-  };
+>(
+  rpcGroup: T,
+  requestName: K
+): (
+  payload: Parameters<InferClient<T>[K]>[0]
+) => ReturnType<InferClient<T>[K]> {
+  return getRPCClient(rpcGroup, requestName);
 }
