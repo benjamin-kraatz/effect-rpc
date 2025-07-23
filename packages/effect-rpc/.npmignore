@@ -1,0 +1,14 @@
+# Ignore example apps and scripts
+examples/
+scripts/
+
+# Ignore dotfiles and dotfolders
+.*
+
+# Ignore test files and configs
+*.test.*
+__tests__/
+
+# Ignore local dev files
+pnpm-lock.yaml
+README.md
