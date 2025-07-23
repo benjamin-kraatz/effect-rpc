@@ -2,9 +2,10 @@
 
 > **Alpha**: This package is experimental and under active development. APIs may change at any time. Feedback and contributions are welcome!
 
-![NPM Version](https://img.shields.io/npm/v/effect-rpc)
+[![NPM Version](https://img.shields.io/npm/v/effect-rpc)](https://www.npmjs.com/package/effect-rpc)
 
-[typedoc documentation](https://effect-rpc-docs.fly.dev/)
+> [!NOTE]
+> **Documentation in Progress:** We're actively working on comprehensive, easy-to-follow guides and walkthroughs. In the meantime, you can refer to the [API documentation](https://effect-rpc-docs.fly.dev/), where all exported members are thoroughly documented with JSDoc comments.
 
 Effect RPC provides a type-safe, robust, and ergonomic way to call backend functions from your frontend—without ever writing `fetch` or worrying about error handling, dependency management, or response parsing. It is powered by [Effect](https://effect.website), enabling seamless full-stack development with strong type inference and composable effects.
 
