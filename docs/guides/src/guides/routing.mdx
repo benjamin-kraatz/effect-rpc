@@ -2,11 +2,11 @@ import { CodeBlock } from '../components/CodeBlock';
 
 # Routing: The GPS of Your Application
 
-Welcome back, my friend! In this section, we're going to talk about routing. Routing is like the GPS of your application. It's what determines how your application responds to different requests. With RPC-Less, you have two ways to handle routing: file-based routing and programmatic routing. Let's take a look at both.
+Welcome back, my friend! In this section, we're going to talk about routing. Routing is like the GPS of your application. It's what determines how your application responds to different requests. With Effect RPC, you have two ways to handle routing: file-based routing and programmatic routing. Let's take a look at both.
 
 ## File-based Routing: The Scenic Route
 
-File-based routing is the easiest way to handle routing in RPC-Less. It's like taking the scenic route on a road trip. You just create a directory of files, and each file corresponds to an API method. It's simple, it's intuitive, and it's a great way to get started with routing.
+File-based routing is the easiest way to handle routing in Effect RPC. It's like taking the scenic route on a road trip. You just create a directory of files, and each file corresponds to an API method. It's simple, it's intuitive, and it's a great way to get started with routing.
 
 ### How it works
 
@@ -27,13 +27,13 @@ export default async ({ input }) => {
   // In a real application, you would fetch this from a database
   return {
     id: input.id,
-    title: 'Learn RPC-Less',
+    title: 'Learn Effect RPC',
     completed: false,
   }
 }
 `}</CodeBlock>
 
-In this example, we're exporting the input and output schemas of the method, as well as a default function that implements the method. RPC-Less will automatically pick up this file and create a `getTodo` method on your API.
+In this example, we're exporting the input and output schemas of the method, as well as a default function that implements the method. Effect RPC will automatically pick up this file and create a `getTodo` method on your API.
 
 ## Programmatic Routing: The Express Lane
 
@@ -41,9 +41,9 @@ Programmatic routing is for when you need more control over your routing logic. 
 
 ### How it works
 
-To create a router programmatically, you use the `createRouter` function from the `@rpc-less/server` package. The `createRouter` function takes an object where the keys are the names of the API methods and the values are functions that implement the methods.
+To create a router programmatically, you use the `createRouter` function from the `effect-rpc` package. The `createRouter` function takes an object where the keys are the names of the API methods and the values are functions that implement the methods.
 
-<CodeBlock language="typescript">{`import { createRouter } from '@rpc-less/server'
+<CodeBlock language="typescript">{`import { createRouter } from 'effect-rpc'
 import { api } from './api'
 
 export const router = createRouter({
@@ -51,7 +51,7 @@ export const router = createRouter({
     // In a real application, you would fetch this from a database
     return {
       id: input.id,
-      title: 'Learn RPC-Less',
+      title: 'Learn Effect RPC',
       completed: false,
     }
   },
@@ -74,7 +74,7 @@ Sometimes, you might want to organize your API into logical groups. This is wher
 
 To create a nested router, you can use the `createRouter` function to create a router and then mount it on a specific path.
 
-<CodeBlock language="typescript">{`import { createRouter } from '@rpc-less/server'
+<CodeBlock language="typescript">{`import { createRouter } from 'effect-rpc'
 
 const todosRouter = createRouter({
   get: async ({ input }) => {

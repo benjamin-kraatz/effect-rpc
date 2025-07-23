@@ -1,8 +1,8 @@
 import { CodeBlock } from '../components/CodeBlock';
 
-# Getting Started: Your First Epic RPC-Less Adventure
+# Getting Started: Your First Epic Effect RPC Adventure
 
-Alright, my friend, it's time to embark on an epic adventure. We're going to build our very first RPC-Less application. It's going to be a simple "todo" application, but don't let that fool you. This is where the magic happens. This is where you'll learn the fundamentals of RPC-Less, and this is where you'll lay the foundation for all of your future RPC-Less projects. By the end of this guide, you'll have a solid understanding of how RPC-Less works, and you'll be ready to start building your own amazing applications.
+Alright, my friend, it's time to embark on an epic adventure. We're going to build our very first Effect RPC application. It's going to be a simple "todo" application, but don't let that fool you. This is where the magic happens. This is where you'll learn the fundamentals of Effect RPC, and this is where you'll lay the foundation for all of your future Effect RPC projects. By the end of this guide, you'll have a solid understanding of how Effect RPC works, and you'll be ready to start building your own amazing applications.
 
 ## Your trusty steed and supplies
 
@@ -32,7 +32,7 @@ And that's it! Our project is forged, enchanted, and ready for battle. See? I to
 
 ## The heart of the dragon: Defining the API
 
-Now for the most important part of our quest. We're going to define the API for our todo application. This is the heart of the dragon, the source of all our power. With RPC-Less, you define your API as a simple TypeScript interface. This interface is the single source of truth for your entire application, and it's what makes RPC-Less so powerful and easy to use.
+Now for the most important part of our quest. We're going to define the API for our todo application. This is the heart of the dragon, the source of all our power. With Effect RPC, you define your API as a simple TypeScript interface. This interface is the single source of truth for your entire application, and it's what makes Effect RPC so powerful and easy to use.
 
 Let's create a new file called `src/api.ts` and add the following code:
 
@@ -71,7 +71,7 @@ Now that we have our API defined, it's time to build a server to implement it. T
 
 Let's create a new file called `src/server.ts` and add the following code:
 
-<CodeBlock language="typescript">{`import { createServer } from '@rpc-less/server'
+<CodeBlock language="typescript">{`import { createServer } from 'effect-rpc'
 import { api } from './api'
 
 const app = createServer({
@@ -81,7 +81,7 @@ const app = createServer({
       // In a real application, you would fetch this from a magical database in the cloud
       return {
         id: input.id,
-        title: 'Conquer the world with RPC-Less',
+        title: 'Conquer the world with Effect RPC',
         completed: false,
       }
     },
@@ -100,7 +100,7 @@ app.listen(3000, () => {
   console.log('🔥 Server is blazing on http://localhost:3000')
 })`}</CodeBlock>
 
-Here, we're using the `createServer` function from the `@rpc-less/server` package to create a new server. We're passing our API definition and a router that implements the API methods. The router is just a plain old JavaScript object where the keys are the names of our API methods and the values are the functions that implement them.
+Here, we're using the `createServer` function from the `effect-rpc` package to create a new server. We're passing our API definition and a router that implements the API methods. The router is just a plain old JavaScript object where the keys are the names of our API methods and the values are the functions that implement them.
 
 For now, we're just returning some dummy data. In a real application, you would fetch this data from a database. But for now, this will do just fine. We're just getting our feet wet.
 
@@ -110,7 +110,7 @@ With our server up and running, it's time to create a client to consume our API.
 
 Let's create a new file called `src/client.ts` and add the following code:
 
-<CodeBlock language="typescript">{`import { createClient } from '@rpc-less/client'
+<CodeBlock language="typescript">{`import { createClient } from 'effect-rpc'
 import { api } from './api'
 
 export const client = createClient<typeof api>({
@@ -119,7 +119,7 @@ export const client = createClient<typeof api>({
   },
 })`}</CodeBlock>
 
-Here, we're using the `createClient` function from the `@rpc-less/client` package to create a new client. We're passing our API definition and a transport that specifies the URL of our server. The transport is what handles the communication between the client and the server. It's like a magical messenger owl, carrying our requests and responses back and forth.
+Here, we're using the `createClient` function from the `effect-rpc` package to create a new client. We're passing our API definition and a transport that specifies the URL of our server. The transport is what handles the communication between the client and the server. It's like a magical messenger owl, carrying our requests and responses back and forth.
 
 And that's it! Our client is all set up. Now, let's use it to call our API.
 
@@ -186,6 +186,6 @@ Now, open up your browser and navigate to `http://localhost:5173`. You should se
 
 ## What's next on our quest?
 
-Congratulations, my friend! You've just completed your first epic RPC-Less adventure. You've learned how to define an API, create a server, create a client, and use the client to call your API. You're well on your way to becoming an RPC-Less legend.
+Congratulations, my friend! You've just completed your first epic Effect RPC adventure. You've learned how to define an API, create a server, create a client, and use the client to call your API. You're well on your way to becoming an Effect RPC legend.
 
-Now that you've got the basics down, you're ready to continue your quest. In the next section, we'll take a closer look at the core concepts of the library. So, grab a potion of healing, and let's continue our adventure. The world of RPC-Less awaits!
+Now that you've got the basics down, you're ready to continue your quest. In the next section, we'll take a closer look at the core concepts of the library. So, grab a potion of healing, and let's continue our adventure. The world of Effect RPC awaits!

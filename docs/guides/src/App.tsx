@@ -99,7 +99,7 @@ export default function App() {
       <div className="bg-gray-50 font-sans antialiased text-gray-900">
         <div className="flex min-h-screen">
           <div className="w-72 bg-gradient-to-b from-gray-800 to-gray-900 text-white p-8 border-r border-gray-700">
-            <h1 className="text-3xl font-bold text-blue-400 mb-2">RPC-Less</h1>
+            <h1 className="text-3xl font-bold text-blue-400 mb-2">Effect RPC</h1>
             <p className="text-gray-400 text-sm mb-8">Documentation & Guides</p>
             <nav className="mt-8">
               <ul className="space-y-2">

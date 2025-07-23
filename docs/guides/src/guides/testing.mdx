@@ -22,7 +22,7 @@ The idea behind the testing pyramid is that you should have a lot of unit tests,
 
 ## Unit Testing
 
-Unit tests are the easiest type of test to write, and they're a great place to start with testing. With RPC-Less, you can unit test your API methods by calling them directly.
+Unit tests are the easiest type of test to write, and they're a great place to start with testing. With Effect RPC, you can unit test your API methods by calling them directly.
 
 ### Writing a unit test
 
@@ -33,7 +33,7 @@ import { router } from '../router'
 
 test('getTodo should return a todo', async () => {
   const todo = await router.getTodo({ input: { id: 1 } })
-  expect(todo).toEqual({ id: 1, title: 'Learn RPC-Less', completed: false })
+  expect(todo).toEqual({ id: 1, title: 'Learn Effect RPC', completed: false })
 })
 `}</CodeBlock>
 
@@ -41,7 +41,7 @@ In this example, we're importing the router and then calling the `getTodo` metho
 
 ## Integration Testing
 
-Integration tests are a bit more complex than unit tests, but they're still relatively easy to write. With RPC-Less, you can integration test your application by sending requests to the server and asserting that the response is correct.
+Integration tests are a bit more complex than unit tests, but they're still relatively easy to write. With Effect RPC, you can integration test your application by sending requests to the server and asserting that the response is correct.
 
 ### Writing an integration test
 
@@ -61,7 +61,7 @@ test('POST / should return a todo', async () => {
 
   expect(response.body).toEqual({
     id: 1,
-    title: 'Learn RPC-Less',
+    title: 'Learn Effect RPC',
     completed: false,
   })
 })
@@ -82,7 +82,7 @@ Here's an example of how to end-to-end test your application using [Playwright](
 test('should display a todo', async ({ page }) => {
   await page.goto('http://localhost:5173')
   await expect(page.locator('h3')).toContainText('My Todo')
-  await expect(page.locator('p')).toContainText('Learn RPC-Less - Pending')
+  await expect(page.locator('p')).toContainText('Learn Effect RPC - Pending')
 })
 `}</CodeBlock>
 
@@ -90,9 +90,9 @@ In this example, we're using Playwright to navigate to the application and then 
 
 ## The End of the Road (For Testing)
 
-And that's it for testing! You've learned about the importance of testing, the testing pyramid, and how to write unit, integration, and end-to-end tests for your RPC-Less application. You're now a testing expert, ready to build robust and reliable applications.
+And that's it for testing! You've learned about the importance of testing, the testing pyramid, and how to write unit, integration, and end-to-end tests for your Effect RPC application. You're now a testing expert, ready to build robust and reliable applications.
 
-This is the end of our RPC-Less adventure. You've learned about the core concepts of the library, you've learned about some of the more advanced features, and you've learned about testing. You're now a true RPC-Less master, ready to build any application you can imagine.
+This is the end of our Effect RPC adventure. You've learned about the core concepts of the library, you've learned about some of the more advanced features, and you've learned about testing. You're now a true Effect RPC master, ready to build any application you can imagine.
 
 So, go out there, build amazing things, and never stop learning. And if you ever get stuck, remember that we're always here to help. Just head over to our [GitHub repository](https://github.com/your-repo) and we'll be happy to help you out.
 

@@ -2,7 +2,7 @@ import { CodeBlock } from '../components/CodeBlock';
 
 # Real-time Applications: Breathing Life into Your Creations
 
-Welcome back, master builder! You've learned how to build powerful and robust applications with RPC-Less. But what if you want to take your creations to the next level? What if you want to build applications that are alive, that breathe, that react to changes in real-time? Well, my friend, you've come to the right place. In this section, we're going to learn how to build real-time applications with RPC-Less.
+Welcome back, master builder! You've learned how to build powerful and robust applications with Effect RPC. But what if you want to take your creations to the next level? What if you want to build applications that are alive, that breathe, that react to changes in real-time? Well, my friend, you've come to the right place. In this section, we're going to learn how to build real-time applications with Effect RPC.
 
 ## What are Real-time Applications?
 
@@ -12,20 +12,20 @@ Real-time applications are applications that update themselves in real-time, wit
 
 Real-time applications work by establishing a persistent connection between the client and the server. This connection allows the server to push data to the client as soon as it becomes available. This is in contrast to traditional applications, where the client has to poll the server for new data.
 
-## Building a Real-time Application with RPC-Less
+## Building a Real-time Application with Effect RPC
 
-With RPC-Less, you can build real-time applications using WebSockets. WebSockets are a communication protocol that provides a full-duplex communication channel over a single TCP connection. This means that the client and the server can send data to each other at the same time.
+With Effect RPC, you can build real-time applications using WebSockets. WebSockets are a communication protocol that provides a full-duplex communication channel over a single TCP connection. This means that the client and the server can send data to each other at the same time.
 
-To build a real-time application with RPC-Less, you'll need to use a WebSocket server on the backend and a WebSocket transport on the frontend.
+To build a real-time application with Effect RPC, you'll need to use a WebSocket server on the backend and a WebSocket transport on the frontend.
 
 ### The WebSocket Server
 
-There are many WebSocket servers available for Node.js, but our favorite is [ws](https://github.com/websockets/ws). It's a simple and easy-to-use WebSocket server that's a perfect match for RPC-Less.
+There are many WebSocket servers available for Node.js, but our favorite is [ws](https://github.com/websockets/ws). It's a simple and easy-to-use WebSocket server that's a perfect match for Effect RPC.
 
 Here's an example of how to create a WebSocket server with `ws`:
 
 <CodeBlock language="typescript">{`import { WebSocketServer } from 'ws';
-import { createServer } from '@rpc-less/server'
+import { createServer } from 'effect-rpc'
 import { api } from './api'
 
 const wss = new WebSocketServer({ port: 8080 });
@@ -52,7 +52,7 @@ In this example, we're creating a WebSocket server that listens for connections 
 
 To connect to our WebSocket server, we'll need to use a WebSocket transport on the client. We can create a custom transport that uses the native WebSocket API.
 
-<CodeBlock language="typescript">{`import { createClient } from '@rpc-less/client'
+<CodeBlock language="typescript">{`import { createClient } from 'effect-rpc'
 import { api } from './api'
 
 const customTransport = {
@@ -146,6 +146,6 @@ In this example, we're subscribing to the `onNewMessage` method. Whenever a new 
 
 ## The Beginning of a New Era
 
-And that's it! You've learned how to build real-time applications with RPC-Less. You've learned about WebSockets, subscriptions, and observables. You're now ready to build applications that are alive, that breathe, that react to changes in real-time.
+And that's it! You've learned how to build real-time applications with Effect RPC. You've learned about WebSockets, subscriptions, and observables. You're now ready to build applications that are alive, that breathe, that react to changes in real-time.
 
 This is the beginning of a new era. An era of real-time applications. An era of applications that are more engaging, more interactive, and more fun to use. So, go out there, build amazing things, and never stop learning. The world is waiting for your next masterpiece.

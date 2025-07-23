@@ -2,13 +2,13 @@ import { CodeBlock } from '../components/CodeBlock';
 
 # File Uploads: Unleashing the Power of the User
 
-Welcome back, intrepid builder! You've learned how to build applications that are fast, scalable, and real-time. But what if you want to give your users the power to upload their own files? What if you want to build an application that allows users to upload their own photos, videos, or documents? Well, my friend, you've come to the right place. In this section, we're going to learn how to handle file uploads with RPC-Less.
+Welcome back, intrepid builder! You've learned how to build applications that are fast, scalable, and real-time. But what if you want to give your users the power to upload their own files? What if you want to build an application that allows users to upload their own photos, videos, or documents? Well, my friend, you've come to the right place. In this section, we're going to learn how to handle file uploads with Effect RPC.
 
 ## The Challenge of File Uploads
 
 File uploads can be a tricky business. You have to worry about a lot of things, like file size limits, file type validation, and security. It's a lot to keep track of, and it's easy to make mistakes.
 
-But don't worry, with RPC-Less, handling file uploads is a breeze. We'll be using a library called [formidable](https://github.com/node-formidable/formidable) to handle our file uploads. Formidable is a powerful and flexible library for parsing form data, and it's a perfect match for RPC-Less.
+But don't worry, with Effect RPC, handling file uploads is a breeze. We'll be using a library called [formidable](https://github.com/node-formidable/formidable) to handle our file uploads. Formidable is a powerful and flexible library for parsing form data, and it's a perfect match for Effect RPC.
 
 ## The Server
 
@@ -17,7 +17,7 @@ To handle file uploads, we'll need to create a new API method on our server. Thi
 ### Creating the upload endpoint
 
 <CodeBlock language="typescript">{`
-import { createServer } from '@rpc-less/server'
+import { createServer } from 'effect-rpc'
 import { api } from './api'
 import formidable from 'formidable';
 import http from 'http';
@@ -39,7 +39,7 @@ const app = createServer({
 })
 
 const server = http.createServer((req, res) => {
-  // You'll need to handle the request with your RPC-Less app
+  // You'll need to handle the request with your Effect RPC app
 });
 
 server.listen(3000, () => {
@@ -90,6 +90,6 @@ In this example, we're creating a simple form that allows the user to select a f
 
 ## The Power is Yours
 
-And that's it! You've learned how to handle file uploads with RPC-Less. You've learned about the challenges of file uploads, and you've learned how to use formidable to parse form data on the server. You're now ready to build applications that allow your users to upload their own files.
+And that's it! You've learned how to handle file uploads with Effect RPC. You've learned about the challenges of file uploads, and you've learned how to use formidable to parse form data on the server. You're now ready to build applications that allow your users to upload their own files.
 
 The power is yours. So, go out there, build amazing things, and never stop learning. The world is waiting for your next masterpiece.

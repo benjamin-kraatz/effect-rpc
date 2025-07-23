@@ -1,12 +1,12 @@
 import { CodeBlock } from "../components/CodeBlock";
 
-# Advanced Topics: Ascending to the Highest Peaks of RPC-Less
+# Advanced Topics: Ascending to the Highest Peaks of Effect RPC
 
-Welcome back, seasoned adventurer! You've navigated the treacherous core concepts of RPC-Less, and you've emerged victorious. 
+Welcome back, seasoned adventurer! You've navigated the treacherous core concepts of Effect RPC, and you've emerged victorious. 
 
-You're now ready to ascend to the highest peaks of the library, where you'll learn about the most advanced and powerful features of RPC-Less. We'll explore middleware, custom transports, and error handling in more detail. 
+You're now ready to ascend to the highest peaks of the library, where you'll learn about the most advanced and powerful features of Effect RPC. We'll explore middleware, custom transports, and error handling in more detail. 
 
-By the end of this section, you'll be a true RPC-Less grandmaster, capable of building even the most complex and awe-inspiring applications.
+By the end of this section, you'll be a true Effect RPC grandmaster, capable of building even the most complex and awe-inspiring applications.
 
 ---
 
@@ -26,7 +26,7 @@ It's a powerful feature that gives you a lot of control over your API.
 
 Let's say you want to add some logging to your API. You could create a middleware function that logs the input of each request.
 
-<CodeBlock language="typescript">{`import { createServer } from "@rpc-less/server";
+<CodeBlock language="typescript">{`import { createServer } from "effect-rpc";
 import { api } from "./api";
 
 const app = createServer({
@@ -64,7 +64,7 @@ It's like passing the torch from one guardian to the next.
 
 ## Custom Transports: Charting Your Own Course
 
-As we've learned, RPC-Less is protocol agnostic. This means that you can use any transport layer you want. The library provides a built-in HTTP transport, but you can also create your own custom transports. This is useful if you want to use RPC-Less with a different protocol, like WebSockets or WebRTC. It's like being the captain of your own ship, free to chart your own course.
+As we've learned, Effect RPC is protocol agnostic. This means that you can use any transport layer you want. The library provides a built-in HTTP transport, but you can also create your own custom transports. This is useful if you want to use Effect RPC with a different protocol, like WebSockets or WebRTC. It's like being the captain of your own ship, free to chart your own course.
 
 ### Creating a custom transport
 
@@ -72,7 +72,7 @@ A transport is just a plain old JavaScript object with two methods: `request` an
 
 Let's say you want to create a custom transport that uses WebSockets. You could create a transport that looks something like this:
 
-<CodeBlock language="typescript">{`import { createClient } from "@rpc-less/client";
+<CodeBlock language="typescript">{`import { createClient } from "effect-rpc";
 import { api } from "./api";
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 
@@ -111,11 +111,11 @@ export const client = createClient<typeof api>({
   transport: customTransport,
 });`}</CodeBlock>
 
-This is just a simple example, but it shows you how powerful custom transports can be. With custom transports, you can use RPC-Less with any protocol you want. The world is your oyster!
+This is just a simple example, but it shows you how powerful custom transports can be. With custom transports, you can use Effect RPC with any protocol you want. The world is your oyster!
 
 ## Error Handling: The Safety Net of the Gods
 
-Errors are an inevitable part of life. They're like the thunderstorms that roll in on a summer day. But with RPC-Less, you have a safety net woven by the gods themselves. The library provides a robust error handling mechanism that allows you to handle errors in a predictable and consistent way.
+Errors are an inevitable part of life. They're like the thunderstorms that roll in on a summer day. But with Effect RPC, you have a safety net woven by the gods themselves. The library provides a robust error handling mechanism that allows you to handle errors in a predictable and consistent way.
 
 ### Handling errors on the client
 
@@ -138,7 +138,7 @@ You can also use a custom error handler on the server to customize the way error
 
 
 <CodeBlock language="typescript">{`
-import { createServer } from "@rpc-less/server";
+import { createServer } from "effect-rpc";
 import { api } from "./api";
 
 const app = createServer({
@@ -164,7 +164,7 @@ You can also use a custom error handler on the client to customize the way error
 
 
 <CodeBlock language="typescript">{`
-import { createClient } from "@rpc-less/client";
+import { createClient } from "effect-rpc";
 import { api } from "./api";
 
 export const client = createClient<typeof api>({
@@ -184,8 +184,8 @@ In this example, we're adding a custom error handler that logs the error and dis
 
 ## The Summit
 
-And that's it, my friend. You've reached the summit of Mount RPC-Less. You've learned about middleware, custom transports, and error handling. You're now a true RPC-Less grandmaster, ready to build any application you can imagine.
+And that's it, my friend. You've reached the summit of Mount Effect RPC. You've learned about middleware, custom transports, and error handling. You're now a true Effect RPC grandmaster, ready to build any application you can imagine.
 
-But this is not the end of your journey. It's just the beginning. There's so much more to learn about RPC-Less, and so many more adventures to be had. So, go out there, build amazing things, and never stop learning. And if you ever get stuck, remember that we're always here to help. Just head over to our [GitHub repository](https://github.com/your-repo) and we'll be happy to help you out.
+But this is not the end of your journey. It's just the beginning. There's so much more to learn about Effect RPC, and so many more adventures to be had. So, go out there, build amazing things, and never stop learning. And if you ever get stuck, remember that we're always here to help. Just head over to our [GitHub repository](https://github.com/your-repo) and we'll be happy to help you out.
 
 Now, go forth and build something amazing! I can't wait to see what you create. The world is waiting for your next masterpiece.
