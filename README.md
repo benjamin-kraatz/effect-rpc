@@ -158,8 +158,10 @@ import { helloRouter } from "@/lib/rpc/service";
 import { AppRuntime } from "@/lib/runtime";
 
 export async function greetUser(): Promise<string> {
-  const request = makeServerRequest(helloRouter, "SayHelloReq");
-  return AppRuntime.runPromise(request({ name }));
+  // Payload is passed so the function because the endpoint is invoked immediately.
+  const request = makeServerRequest(helloRouter, "SayHelloReq", { name });
+  // Request is now the return type of the "SayHelloReq" function, which is an Effect<string, SayHelloFailedError, never>
+  return AppRuntime.runPromise(request);
 }
 ```
 
