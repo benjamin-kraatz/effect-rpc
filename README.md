@@ -125,7 +125,7 @@ import { useRPCRequest } from "effect-rpc/client";
 import { helloRouter } from "@/lib/rpc/service";
 import { AppRuntime } from "@/lib/runtime";
 
-export function loadUser() {
+export function GreetUserButton() {
   const sayHello = useRPCRequest(helloRouter, "SayHelloReq");
 
   const greet = async () => {
