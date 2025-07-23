@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@effect/rpc": "~0.68.0",
+    "effect": "3.17.1",
     "effect-rpc": "../..",
     "react": "19.1.0",
     "react-dom": "19.1.0",
