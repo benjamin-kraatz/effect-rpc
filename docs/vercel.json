@@ -1,0 +1,11 @@
+{
+  "builds": [
+    {
+      "src": "guides/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "guides/dist"
+      }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+# State Management: Taming the State Monster
+
+Welcome back, my friend! In this section, we're going to talk about state management. State management is one of the most challenging parts of building a web application. It's like trying to tame a wild beast. But don't worry, with RPC-Less and Zustand, we can tame the state monster together.
+
+## What is State?
+
+Before we dive into state management, let's talk about what state actually is. State is just a fancy word for data that changes over time. It's the data that your application needs to keep track of, like the items in a shopping cart, the text in a search box, or the user that's currently logged in.
+
+### Why is it so hard?
+
+State management is hard because state is constantly changing. And when state changes, you need to make sure that your UI is updated to reflect those changes. This can be a tricky business, especially in large and complex applications.
+
+This is where state management libraries come in. They provide a structured way to manage your state, which makes it easier to reason about your application and prevent bugs.
+
+## Zustand: The State Management Superhero
+
+There are a lot of state management libraries out there, but our favorite is [Zustand](https://github.com/pmndrs/zustand). Zustand is a small, fast, and scalable state management library that's a perfect match for RPC-Less. It's simple, it's intuitive, and it's a joy to use.
+
+### Creating a store
+
+With Zustand, you create a store to hold your state. A store is just a plain old JavaScript object that contains your state and any actions that can modify that state.
+
+Let's create a store for our todo application. Create a new file called `src/store.ts` and add the following code:
+
+```ts
+import { create } from 'zustand'
+import { client } from './client'
+import { api } from './api'
+
+type Todo = api['getTodo']['output']
+
+interface Store {
+  todos: Todo[]
+  addTodo: (todo: Todo) => void
+  fetchTodos: () => Promise<void>
+}
+
+export const useStore = create<Store>((set) => ({
+  todos: [],
+  addTodo: (todo) => set((state) => ({ todos: [...state.todos, todo] })),
+  fetchTodos: async () => {
+    const todos = await client.getTodos()
+    set({ todos })
+  },
+}))
+```
+
+In this example, we're creating a store with an initial state that contains an empty array of todos. We're also defining two actions: `addTodo` and `fetchTodos`. The `addTodo` action adds a new todo to the store, and the `fetchTodos` action fetches the todos from the server and updates the store.
+
+### Using the store
+
+To use the store in your components, you use the `useStore` hook.
+
+```tsx
+import { useStore } from '../store'
+
+function MyComponent() {
+  const todos = useStore((state) => state.todos)
+  const addTodo = useStore((state) => state.addTodo)
+  const fetchTodos = useStore((state) => state.fetchTodos)
+
+  React.useEffect(() => {
+    fetchTodos()
+  }, [fetchTodos])
+
+  return (
+    <div>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>{todo.title}</li>
+        ))}
+      </ul>
+      <button
+        onClick={() =>
+          addTodo({ id: 1, title: 'New Todo', completed: false })
+        }
+      >
+        Add Todo
+      </button>
+    </div>
+  )
+}
+```
+
+In this example, we're using the `useStore` hook to get the `todos`, `addTodo`, and `fetchTodos` from the store. We're then displaying the todos in a list and providing a button to add a new todo.
+
+## The End of the Road (For State Management)
+
+And that's it for state management! You've learned about what state is, why it's so hard to manage, and how to use Zustand to tame the state monster. You're now a state management expert, ready to build any application you can imagine.
+
+In the next section, we'll talk about testing. So, take a break, grab a snack, and I'll see you in the next section.

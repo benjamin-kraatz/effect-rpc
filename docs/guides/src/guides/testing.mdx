@@ -1,0 +1,100 @@
+# Testing: The Guardian Angel of Your Application
+
+Welcome back, my friend! In this section, we're going to talk about testing. Testing is like the guardian angel of your application. It watches over your code and makes sure that everything is working as it should. It's an essential part of building a robust and reliable application, and it's a skill that every developer should have.
+
+## Why is Testing so Important?
+
+Testing is important because it gives you confidence in your code. It allows you to make changes to your application without having to worry about breaking something. It's like having a safety net that catches you when you fall.
+
+Testing is also important because it helps you to write better code. When you write tests, you're forced to think about your code from a different perspective. You have to think about all the different ways that your code can be used, and you have to think about all the different ways that it can fail. This helps you to write code that is more modular, more flexible, and easier to reason about.
+
+## The Testing Pyramid
+
+The testing pyramid is a concept that helps you to think about the different types of tests that you should be writing. The pyramid is divided into three layers: unit tests, integration tests, and end-to-end tests.
+
+*   **Unit tests** are the foundation of the pyramid. They're small, fast, and they test a single unit of code in isolation.
+*   **Integration tests** are the middle layer of the pyramid. They test how different units of code work together.
+*   **End-to-end tests** are the top layer of the pyramid. They test the entire application from beginning to end.
+
+The idea behind the testing pyramid is that you should have a lot of unit tests, a medium amount of integration tests, and a small amount of end-to-end tests. This is because unit tests are fast and cheap to write, while end-to-end tests are slow and expensive to write.
+
+## Unit Testing
+
+Unit tests are the easiest type of test to write, and they're a great place to start with testing. With RPC-Less, you can unit test your API methods by calling them directly.
+
+### Writing a unit test
+
+Here's an example of how to unit test an API method using [Vitest](https://vitest.dev/):
+
+```ts
+import { expect, test } from 'vitest'
+import { router } from '../router'
+
+test('getTodo should return a todo', async () => {
+  const todo = await router.getTodo({ input: { id: 1 } })
+  expect(todo).toEqual({ id: 1, title: 'Learn RPC-Less', completed: false })
+})
+```
+
+In this example, we're importing the router and then calling the `getTodo` method directly. We're then asserting that the method returns the expected output.
+
+## Integration Testing
+
+Integration tests are a bit more complex than unit tests, but they're still relatively easy to write. With RPC-Less, you can integration test your application by sending requests to the server and asserting that the response is correct.
+
+### Writing an integration test
+
+Here's an example of how to integration test your application using [Supertest](https://github.com/ladjs/supertest):
+
+```ts
+import { expect, test } from 'vitest'
+import request from 'supertest'
+import { app } from '../server'
+
+test('POST / should return a todo', async () => {
+  const response = await request(app)
+    .post('/')
+    .send({
+      method: 'getTodo',
+      input: { id: 1 },
+    })
+
+  expect(response.body).toEqual({
+    id: 1,
+    title: 'Learn RPC-Less',
+    completed: false,
+  })
+})
+```
+
+In this example, we're using Supertest to send a request to the server and then asserting that the response is correct.
+
+## End-to-End Testing
+
+End-to-end tests are the most complex type of test to write, but they're also the most powerful. With end-to-end tests, you can test your entire application from beginning to end, just like a real user would.
+
+### Writing an end-to-end test
+
+Here's an example of how to end-to-end test your application using [Playwright](https://playwright.dev/):
+
+```ts
+import { expect, test } from '@playwright/test'
+
+test('should display a todo', async ({ page }) => {
+  await page.goto('http://localhost:5173')
+  await expect(page.locator('h3')).toContainText('My Todo')
+  await expect(page.locator('p')).toContainText('Learn RPC-Less - Pending')
+})
+```
+
+In this example, we're using Playwright to navigate to the application and then asserting that the page contains the expected content.
+
+## The End of the Road (For Testing)
+
+And that's it for testing! You've learned about the importance of testing, the testing pyramid, and how to write unit, integration, and end-to-end tests for your RPC-Less application. You're now a testing expert, ready to build robust and reliable applications.
+
+This is the end of our RPC-Less adventure. You've learned about the core concepts of the library, you've learned about some of the more advanced features, and you've learned about testing. You're now a true RPC-Less master, ready to build any application you can imagine.
+
+So, go out there, build amazing things, and never stop learning. And if you ever get stuck, remember that we're always here to help. Just head over to our [GitHub repository](https://github.com/your-repo) and we'll be happy to help you out.
+
+Now, go forth and build something amazing! I can't wait to see what you create.

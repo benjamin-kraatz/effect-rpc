@@ -1,0 +1,102 @@
+# Routing: The GPS of Your Application
+
+Welcome back, my friend! In this section, we're going to talk about routing. Routing is like the GPS of your application. It's what determines how your application responds to different requests. With RPC-Less, you have two ways to handle routing: file-based routing and programmatic routing. Let's take a look at both.
+
+## File-based Routing: The Scenic Route
+
+File-based routing is the easiest way to handle routing in RPC-Less. It's like taking the scenic route on a road trip. You just create a directory of files, and each file corresponds to an API method. It's simple, it's intuitive, and it's a great way to get started with routing.
+
+### How it works
+
+To use file-based routing, you need to create a directory called `src/routes` in your project. Then, you can create files in this directory to define your API methods.
+
+For example, to create a `getTodo` method, you would create a file called `src/routes/getTodo.ts` with the following content:
+
+```ts
+import { z } from 'zod'
+
+export const input = z.object({ id: z.number() })
+export const output = z.object({
+  id: z.number(),
+  title: z.string(),
+  completed: z.boolean(),
+})
+
+export default async ({ input }) => {
+  // In a real application, you would fetch this from a database
+  return {
+    id: input.id,
+    title: 'Learn RPC-Less',
+    completed: false,
+  }
+}
+```
+
+In this example, we're exporting the input and output schemas of the method, as well as a default function that implements the method. RPC-Less will automatically pick up this file and create a `getTodo` method on your API.
+
+## Programmatic Routing: The Express Lane
+
+Programmatic routing is for when you need more control over your routing logic. It's like taking the express lane on a highway. It's faster, it's more flexible, and it's great for more complex applications.
+
+### How it works
+
+To create a router programmatically, you use the `createRouter` function from the `@rpc-less/server` package. The `createRouter` function takes an object where the keys are the names of the API methods and the values are functions that implement the methods.
+
+```ts
+import { createRouter } from '@rpc-less/server'
+import { api } from './api'
+
+export const router = createRouter({
+  getTodo: async ({ input }) => {
+    // In a real application, you would fetch this from a database
+    return {
+      id: input.id,
+      title: 'Learn RPC-Less',
+      completed: false,
+    }
+  },
+  createTodo: async ({ input }) => {
+    // In a real application, you would save this to a database
+    return {
+      id: Math.floor(Math.random() * 1000),
+      title: input.title,
+      completed: false,
+    }
+  },
+})
+```
+
+## Nested Routers: The Scenic Detour
+
+Sometimes, you might want to organize your API into logical groups. This is where nested routers come in. Nested routers are like taking a scenic detour on your road trip. They allow you to break up your API into smaller, more manageable pieces.
+
+### How it works
+
+To create a nested router, you can use the `createRouter` function to create a router and then mount it on a specific path.
+
+```ts
+import { createRouter } from '@rpc-less/server'
+
+const todosRouter = createRouter({
+  get: async ({ input }) => {
+    // ...
+  },
+  create: async ({ input }) => {
+    // ...
+  },
+})
+
+export const router = createRouter({
+  todos: todosRouter,
+})
+```
+
+In this example, we're creating a `todosRouter` that handles the `get` and `create` methods for todos. We're then mounting this router on the `todos` path of the main router.
+
+This would result in the following API methods: `todos.get` and `todos.create`.
+
+## The End of the Road (For Routing)
+
+And that's it for routing! You've learned about file-based routing, programmatic routing, and nested routers. You're now a routing expert, ready to build any application you can imagine.
+
+In the next section, we'll talk about state management. So, take a break, grab a snack, and I'll see you in the next section.

@@ -1,0 +1,153 @@
+# Real-time Applications: Breathing Life into Your Creations
+
+Welcome back, master builder! You've learned how to build powerful and robust applications with RPC-Less. But what if you want to take your creations to the next level? What if you want to build applications that are alive, that breathe, that react to changes in real-time? Well, my friend, you've come to the right place. In this section, we're going to learn how to build real-time applications with RPC-Less.
+
+## What are Real-time Applications?
+
+Real-time applications are applications that update themselves in real-time, without the need for the user to refresh the page. Think of a chat application, a stock ticker, or a collaborative document editor. These are all examples of real-time applications.
+
+### The magic of real-time
+
+Real-time applications work by establishing a persistent connection between the client and the server. This connection allows the server to push data to the client as soon as it becomes available. This is in contrast to traditional applications, where the client has to poll the server for new data.
+
+## Building a Real-time Application with RPC-Less
+
+With RPC-Less, you can build real-time applications using WebSockets. WebSockets are a communication protocol that provides a full-duplex communication channel over a single TCP connection. This means that the client and the server can send data to each other at the same time.
+
+To build a real-time application with RPC-Less, you'll need to use a WebSocket server on the backend and a WebSocket transport on the frontend.
+
+### The WebSocket Server
+
+There are many WebSocket servers available for Node.js, but our favorite is [ws](https://github.com/websockets/ws). It's a simple and easy-to-use WebSocket server that's a perfect match for RPC-Less.
+
+Here's an example of how to create a WebSocket server with `ws`:
+
+```ts
+import { WebSocketServer } from 'ws';
+import { createServer } from '@rpc-less/server'
+import { api } from './api'
+
+const wss = new WebSocketServer({ port: 8080 });
+
+const app = createServer({
+  api,
+  router: {
+    // ...
+  },
+});
+
+wss.on('connection', function connection(ws) {
+  ws.on('message', function message(data) {
+    const { method, input } = JSON.parse(data);
+    const result = await app.router[method]({ input });
+    ws.send(JSON.stringify(result));
+  });
+});
+```
+
+In this example, we're creating a WebSocket server that listens for connections on port 8080. When a client connects, we listen for messages. When we receive a message, we parse it, call the appropriate API method, and then send the result back to the client.
+
+### The WebSocket Transport
+
+To connect to our WebSocket server, we'll need to use a WebSocket transport on the client. We can create a custom transport that uses the native WebSocket API.
+
+```ts
+import { createClient } from '@rpc-less/client'
+import { api } from './api'
+
+const customTransport = {
+  request: async (method, input) => {
+    const ws = new WebSocket('ws://localhost:8080/');
+    return new Promise((resolve, reject) => {
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ method, input }));
+      };
+      ws.onmessage = (message) => {
+        resolve(JSON.parse(message.data));
+      };
+      ws.onerror = (error) => {
+        reject(error);
+      };
+    })
+  },
+  subscribe: (method, input, onData) => {
+    const ws = new WebSocket('ws://localhost:8080/');
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ method, input }));
+    };
+    ws.onmessage = (message) => {
+      onData(JSON.parse(message.data));
+    };
+    return () => {
+      ws.close();
+    };
+  },
+}
+
+export const client = createClient<typeof api>({
+  transport: customTransport,
+})
+```
+
+### Subscriptions
+
+To create a real-time application, you'll need to use subscriptions. Subscriptions allow the client to subscribe to a stream of data from the server. When new data is available, the server will push it to the client.
+
+#### Defining a subscription
+
+To create a subscription, you'll need to define a method on your API that returns a stream of data.
+
+```ts
+import { z } from 'zod'
+import { observable } from '@trpc/server/observable';
+
+export const api = {
+  // ...
+  onNewMessage: {
+    output: z.object({
+      id: z.number(),
+      text: z.string(),
+    }),
+    subscribe: () => {
+      return observable((emit) => {
+        const onMessage = (message) => {
+          emit.next(message);
+        };
+        // In a real application, you would subscribe to a message broker
+        // and call onMessage whenever a new message is received.
+        const interval = setInterval(() => {
+          onMessage({ id: 1, text: 'Hello, world!' });
+        }, 1000);
+
+        return () => {
+          clearInterval(interval);
+        };
+      });
+    }
+  }
+}
+```
+
+In this example, we're defining a `onNewMessage` method that returns an observable. The observable emits a new message every second.
+
+#### Subscribing on the client
+
+You can then subscribe to this method on the client.
+
+```tsx
+import { client } from '../client'
+
+client.onNewMessage.subscribe(undefined, {
+  onData: (message) => {
+    console.log(message)
+  },
+})
+```
+
+In this example, we're subscribing to the `onNewMessage` method. Whenever a new message is received, we log it to the console.
+
+## The Beginning of a New Era
+
+And that's it! You've learned how to build real-time applications with RPC-Less. You've learned about WebSockets, subscriptions, and observables. You're now ready to build applications that are alive, that breathe, that react to changes in real-time.
+
+This is the beginning of a new era. An era of real-time applications. An era of applications that are more engaging, more interactive, and more fun to use. So, go out there, build amazing things, and never stop learning. The world is waiting for your next masterpiece.

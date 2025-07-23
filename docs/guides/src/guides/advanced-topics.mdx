@@ -1,0 +1,160 @@
+# Advanced Topics: Ascending to the Highest Peaks of RPC-Less
+
+Welcome back, seasoned adventurer! You've navigated the treacherous core concepts of RPC-Less, and you've emerged victorious. You're now ready to ascend to the highest peaks of the library, where you'll learn about the most advanced and powerful features of RPC-Less. We'll explore middleware, custom transports, and error handling in more detail. By the end of this section, you'll be a true RPC-Less grandmaster, capable of building even the most complex and awe-inspiring applications.
+
+## Middleware: The Guardian at the Gates
+
+Middleware is like a guardian at the gates of your API. It's a way to add custom logic to your server that gets executed before your API methods are called. You can use middleware for all sorts of things, like logging, authentication, or even transforming the input of a request. It's a powerful feature that gives you a lot of control over your API.
+
+### Adding middleware
+
+Let's say you want to add some logging to your API. You could create a middleware function that logs the input of each request.
+
+```ts
+import { createServer } from '@rpc-less/server'
+import { api } from './api'
+
+const app = createServer({
+  api,
+  middleware: [
+    async ({ input, next }) => {
+      console.log(`⚔️ A challenger approaches with input: ${JSON.stringify(input)}`)
+      const result = await next(input)
+      console.log(`🏆 The challenger has been victorious!`)
+      return result
+    },
+  ],
+  router: {
+    // ...
+  },
+})
+```
+
+In this example, we're adding a middleware function that logs the input of each request. The `next` function is what calls the next middleware function in the chain, or the API method if it's the last one. It's like passing the torch from one guardian to the next.
+
+> **A story from the castle walls:** I once worked on a project where we had to add a complex authentication system to our API. We had to check for a valid session token, we had to check for the user's permissions, and we had to do it all before any of our API methods were called. It was a daunting task, but then we discovered middleware. We were able to create a single middleware function that handled all of our authentication logic. It was like having a whole army of guardians protecting our API. It made our code so much cleaner and easier to maintain, and it gave us the peace of mind of knowing that our API was secure.
+
+## Custom Transports: Charting Your Own Course
+
+As we've learned, RPC-Less is protocol agnostic. This means that you can use any transport layer you want. The library provides a built-in HTTP transport, but you can also create your own custom transports. This is useful if you want to use RPC-Less with a different protocol, like WebSockets or WebRTC. It's like being the captain of your own ship, free to chart your own course.
+
+### Creating a custom transport
+
+A transport is just a plain old JavaScript object with two methods: `request` and `subscribe`. The `request` method is used to send a request to the server and receive a response. The `subscribe` method is used to subscribe to a stream of data from the server.
+
+Let's say you want to create a custom transport that uses WebSockets. You could create a transport that looks something like this:
+
+```ts
+import { createClient } from '@rpc-less/client'
+import { api } from './api'
+import { w3cwebsocket as W3CWebSocket } from "websocket";
+
+const customTransport = {
+  request: async (method, input) => {
+    // Send a message in a bottle across the great sea of the internet
+    const ws = new W3CWebSocket('ws://localhost:8080/');
+    return new Promise((resolve, reject) => {
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ method, input }));
+      };
+      ws.onmessage = (message) => {
+        resolve(JSON.parse(message.data));
+      };
+      ws.onerror = (error) => {
+        reject(error);
+      };
+    })
+  },
+  subscribe: (method, input, onData) => {
+    // Send a raven to the server to request a stream of messages
+    const ws = new W3CWebSocket('ws://localhost:8080/');
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ method, input }));
+    };
+    ws.onmessage = (message) => {
+      onData(JSON.parse(message.data));
+    };
+    return () => {
+      ws.close();
+    };
+  },
+}
+
+export const client = createClient<typeof api>({
+  transport: customTransport,
+})
+```
+
+This is just a simple example, but it shows you how powerful custom transports can be. With custom transports, you can use RPC-Less with any protocol you want. The world is your oyster!
+
+## Error Handling: The Safety Net of the Gods
+
+Errors are an inevitable part of life. They're like the thunderstorms that roll in on a summer day. But with RPC-Less, you have a safety net woven by the gods themselves. The library provides a robust error handling mechanism that allows you to handle errors in a predictable and consistent way.
+
+### Handling errors on the client
+
+When an error occurs on the server, it's serialized and sent to the client. The client then deserializes the error and throws it. This means that you can use a standard `try...catch` block to handle errors in your client-side code.
+
+```tsx
+try {
+  const todo = await client.getTodo({ id: 1 })
+  // ...
+} catch (error) {
+  console.error('🔥 By the gods, an error has occurred!', error)
+  // Handle the error with the grace of a seasoned warrior
+}
+```
+
+### Handling errors on the server
+
+You can also use a custom error handler on the server to customize the way errors are handled.
+
+```ts
+import { createServer } from '@rpc-less/server'
+import { api } from './api'
+
+const app = createServer({
+  api,
+  onError: (error) => {
+    console.error('😱 A terrible beast has been unleashed!', error)
+    return {
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'A terrible beast has been unleashed! Flee for your lives!',
+    }
+  },
+  router: {
+    // ...
+  },
+})
+```
+
+In this example, we're adding a custom error handler that logs the error and returns a generic error message to the client.
+
+### Customizing error handling on the client
+
+You can also use a custom error handler on the client to customize the way errors are handled.
+
+```ts
+import { createClient } from '@rpc-less/client'
+import { api } from './api'
+
+export const client = createClient<typeof api>({
+  transport: {
+    url: 'http://localhost:3000',
+  },
+  onError: (error) => {
+    console.error('😭 The heavens are weeping!', error)
+    alert('The heavens are weeping! An error has occurred. Please try again later.')
+  },
+})
+```
+
+In this example, we're adding a custom error handler that logs the error and displays an alert to the user.
+
+## The Summit
+
+And that's it, my friend. You've reached the summit of Mount RPC-Less. You've learned about middleware, custom transports, and error handling. You're now a true RPC-Less grandmaster, ready to build any application you can imagine.
+
+But this is not the end of your journey. It's just the beginning. There's so much more to learn about RPC-Less, and so many more adventures to be had. So, go out there, build amazing things, and never stop learning. And if you ever get stuck, remember that we're always here to help. Just head over to our [GitHub repository](https://github.com/your-repo) and we'll be happy to help you out.
+
+Now, go forth and build something amazing! I can't wait to see what you create. The world is waiting for your next masterpiece.
