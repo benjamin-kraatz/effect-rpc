@@ -4,7 +4,7 @@
   "types": "index.d.ts",
   "module": "index.ts",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Benjamin Kraatz",
     "email": "benjamin-kraatz@example.com"
