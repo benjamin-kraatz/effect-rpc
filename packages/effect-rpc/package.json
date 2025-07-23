@@ -1,7 +1,7 @@
 {
   "name": "effect-rpc",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "index.ts",
+  "types": "index.ts",
   "module": "index.ts",
   "type": "module",
   "version": "0.4.1",
@@ -22,8 +22,9 @@
   "homepage": "https://github.com/benjamin-kraatz/effect-rpc",
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js"
+      "types": "./index.ts",
+      "import": "./index.ts",
+      "default": "./index.ts"
     }
   },
   "scripts": {
