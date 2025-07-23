@@ -6,7 +6,6 @@
 
 [typedoc documentation](https://effect-rpc-docs.fly.dev/)
 
-
 Effect RPC provides a type-safe, robust, and ergonomic way to call backend functions from your frontend—without ever writing `fetch` or worrying about error handling, dependency management, or response parsing. It is powered by [Effect](https://effect.website), enabling seamless full-stack development with strong type inference and composable effects.
 
 ## Features
@@ -145,6 +144,22 @@ export function GreetUserButton() {
   };
 
   return <button onClick={greet}>Greet me!</button>;
+}
+```
+
+#### 4.2 In server actions
+
+```jsx
+// src/lib/actions.ts
+"use server";
+
+import { makeServerRequest } from "effect-rpc";
+import { helloRouter } from "@/lib/rpc/service";
+import { AppRuntime } from "@/lib/runtime";
+
+export async function greetUser(): Promise<string> {
+  const request = makeServerRequest(helloRouter, "SayHelloReq");
+  return AppRuntime.runPromise(request({ name }));
 }
 ```
 
