@@ -31,11 +31,10 @@ export default function RootLayout({
       >
         <SidebarProvider>
           <AppSidebar />
-          <main>
-            <div className="fixed bottom-2 left-2 p-2 rounded-lg bg-card shadow-md z-50">
-              <SidebarTrigger />
+          <main className="w-full h-full min-h-screen flex flex-col items-center justify-start bg-background">
+            <div className="w-full max-w-3xl px-5 pb-10 mx-auto">
+              {children}
             </div>
-            <div className="max-w-3xl px-5 pb-10 mx-auto">{children}</div>
           </main>
         </SidebarProvider>
       </body>

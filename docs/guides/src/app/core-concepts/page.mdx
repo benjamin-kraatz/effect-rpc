@@ -1,0 +1,185 @@
+import { CodeBlock } from '@/components/CodeBlock';
+
+# Core Concepts: Unveiling the Secrets of Effect RPC
+
+Welcome back, brave adventurer! You've successfully completed your first quest, and you're ready to delve deeper into the mysteries of Effect RPC. In this section, we're going to unveil the secrets of the library. We'll explore the API definition, the server, the client, and the transport in more detail. By the end of this section, you'll have a profound understanding of how Effect RPC works, and you'll be ready to wield its power to build even more magnificent applications.
+
+## The API Definition: The Sacred Scrolls of Your Application
+
+As we've discovered, the API definition is the sacred scrolls of your application. It's the ancient text that describes the methods and data structures of your API. It's the single source of truth for your entire application, and it's what makes Effect RPC so powerful and easy to use.
+
+### A simple object
+
+Let's once again gaze upon the sacred scrolls of our todo application:
+
+<CodeBlock language="typescript">{`import { z } from 'zod'
+
+export const api = {
+  getTodo: {
+    input: z.object({ id: z.number() }),
+    output: z.object({
+      id: z.number(),
+      title: z.string(),
+      completed: z.boolean(),
+    }),
+  },
+  createTodo: {
+    input: z.object({ title: z.string() }),
+    output: z.object({
+      id: z.number(),
+      title: z.string(),
+      completed: z.boolean(),
+    }),
+  },
+}
+`}</CodeBlock>
+
+<CodeBlock language="typescript">{`
+import { z } from 'zod'
+
+export const api = {
+  getTodo: {
+    input: z.object({ id: z.number() }),
+    output: z.object({
+      id: z.number(),
+      title: z.string(),
+      completed: z.boolean(),
+    }),
+  },
+  createTodo: {
+    input: z.object({ title: z.string() }),
+    output: z.object({
+      id: z.number(),
+      title: z.string(),
+      completed: z.boolean(),
+    }),
+  },
+}
+`}</CodeBlock>
+
+As you can see, the API definition is just a plain old JavaScript object. The keys of the object are the names of our API methods, and the values are objects that define the input and output schemas of the method. It's a simple and elegant way to define your API, and it's what enables the magic of Effect RPC.
+
+> **A wise old sage once told me:** "The API definition is the most important part of your application. It's the foundation upon which everything else is built. If you get the API definition right, everything else will fall into place." And you know what? He was right. A well-designed API definition can make your life so much easier. It can make your code more modular, more testable, and easier to reason about. So, take your time when you're designing your API definition. It's an investment that will pay off in the long run.
+
+### The secret ingredient
+
+The API definition is what allows the library to generate the client and server code, and it's what ensures that your client and server are always in sync. It's a simple but powerful concept, and it's what makes Effect RPC so special. It's the secret ingredient that makes Effect RPC so delicious.
+
+## The Server: The Alchemist's Workshop
+
+The server is the alchemist's workshop of your application. It's where you mix your potions, cast your spells, and bring your creations to life. It's where all the business logic lives, and it's what implements the API that you defined in your sacred scrolls.
+
+### Creating the server
+
+Let's once again enter the alchemist's workshop of our todo application:
+
+<CodeBlock language="typescript">{`
+import { createServer } from 'effect-rpc'
+import { api } from './api'
+
+const app = createServer({
+  api,
+  router: {
+    getTodo: async ({ input }) => {
+      // Here, you would consult the ancient texts of your database
+      return {
+        id: input.id,
+        title: 'Learn the ancient art of Effect RPC',
+        completed: false,
+      }
+    },
+    createTodo: async ({ input }) => {
+      // Here, you would inscribe a new entry in the sacred scrolls of your database
+      return {
+        id: Math.floor(Math.random() * 1000),
+        title: input.title,
+        completed: false,
+      }
+    },
+  },
+})
+
+app.listen(3000, () => {
+  console.log('⚗️ The alchemist is brewing on http://localhost:3000')
+})
+`}</CodeBlock>
+
+As you can see, the server is created using the `createServer` function from the `effect-rpc` package. This function takes two arguments: the API definition and a router that implements the API methods.
+
+### The router
+
+The router is just a plain old JavaScript object where the keys are the names of our API methods and the values are the functions that implement them. These functions receive an object with the input of the method, and they should return the output of the method.
+
+> **A word of caution from the alchemist:** "Be careful what you put in your potions. A single misplaced ingredient can have disastrous consequences." The same is true of your router functions. Keep them clean and simple. They should only be responsible for handling the request and returning a response. All of your business logic should live in separate modules that you can call from your router functions. This will make your code more modular, more testable, and easier to reason about. It will also make it easier to reuse your code in other parts of your application.
+
+## The Client: The Palantír of Your Application
+
+The client is the Palantír of your application. It's the seeing-stone that allows you to peer into the world of your application and interact with it. It's what your users will use to interact with your application, and it's what consumes the API that you defined in your sacred scrolls.
+
+### Creating the client
+
+Let's once again gaze into the Palantír of our todo application:
+
+<CodeBlock language="typescript">{`
+import { createClient } from 'effect-rpc'
+import { api } from './api'
+
+export const client = createClient<typeof api>({
+  transport: {
+    url: 'http://localhost:3000',
+  },
+})
+`}</CodeBlock>
+
+As you can see, the client is created using the `createClient` function from the `effect-rpc` package. This function takes a configuration object that specifies the API definition and the transport.
+
+### A typed object
+
+The client is a typed object that has the same methods as the API. When you call a method on the client, it will send a request to the server and return the response. It's like having a local version of your API that you can call from your frontend code. It's a powerful and convenient way to interact with your API, and it's what makes Effect RPC so enjoyable to use.
+
+## The Transport: The Great Eagle of Your Application
+
+The transport is the Great Eagle of your application. It's the noble creature that carries your messages between the client and the server. It's responsible for sending requests to the server and receiving responses. Effect RPC is protocol agnostic, which means that you can use any transport layer you want. The library provides a built-in HTTP transport, but you can also create your own custom transports.
+
+### The HTTP transport
+
+The HTTP transport is configured with the URL of the server.
+
+<CodeBlock language="typescript">{`
+export const client = createClient<typeof api>({
+  transport: {
+    url: 'http://localhost:3000',
+  },
+})
+`}</CodeBlock>
+
+### Customizing the transport
+
+You can also provide a custom `fetch` implementation to the transport. This is useful if you want to add custom headers or a token to the request.
+
+<CodeBlock language="typescript">{`
+export const client = createClient<typeof api>({
+  transport: {
+    url: 'http://localhost:3000',
+    fetch: (url, options) => {
+      // Attach a secret message to the Great Eagle's leg
+      const token = 'a-secret-message-from-the-king'
+      return fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          Authorization: "Bearer ",
+        },
+      })
+    },
+  },
+})
+`}</CodeBlock>
+
+This allows you to customize the way requests are sent to the server, for example, to add authentication headers. It's a powerful feature that gives you a lot of flexibility.
+
+## The Grand Tapestry
+
+So, there you have it. The core concepts of Effect RPC. The API definition, the server, the client, and the transport. These are the threads that make up the grand tapestry of your application. Once you understand how these threads are woven together, you'll be able to create any application you can imagine.
+
+In the next section, we'll explore some of the more advanced features of Effect RPC. We'll learn about middleware, custom transports, and error handling. So, take a moment to admire the tapestry you've woven, and I'll see you in the next section. The adventure continues!
