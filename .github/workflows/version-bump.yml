@@ -47,7 +47,12 @@ jobs:
         id: get_next_version
         uses: thenativeweb/get-next-version@main
         with:
-          prefix: ''
+          prefix: 'v'
+
+      - name: Print version info
+        run: |
+          echo "Version from get-next-version: ${{ steps.get_next_version.outputs.version }}"
+          echo "Is new version? ${{ steps.get_next_version.outputs.hasNextVersion }}"
 
       - name: Create release
         if: steps.get_next_version.outputs.hasNextVersion == 'true'
