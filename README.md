@@ -33,7 +33,7 @@ yarn add effect-rpc
 ### 1. Define the requests and router
 
 ```ts
-// src/lib/rpc/service.ts
+// src/lib/rpc/hello/requests.ts
 import * as S from "effect/Schema";
 
 export class SayHelloFailedError extends S.TaggedError<SayHelloFailedError>("SayHelloFailedError", {
@@ -53,15 +53,14 @@ export class SayHelloReq extends S.TaggedRequest<SayHelloReq>("SayHelloReq")(
 
 export const helloRouter = RpcGroup.make(
   Rpc.fromTaggedRequest(SayHelloReq),
-  Rpc.fromTaggedRequest(SayByeReq)
-  Rpc.fromTaggedRequest(PingPongReq).middleware(AuthMiddleware),
+  Rpc.fromTaggedRequest(SayByeReq).middleware(AuthMiddleware),
 ); // or .middleware(AuthMiddleware) here to add it to all. Just @effect/rpc
 ```
 
 ### 2. Define the implementation
 
 ```ts
-// src/lib/rpc/hello.ts
+// src/lib/rpc/hello/service.ts
 import * as Effect from "effect/Effect";
 
 export class HelloService extends Effect.Service<HelloService>()(
@@ -71,7 +70,6 @@ export class HelloService extends Effect.Service<HelloService>()(
     succeed: {
       sayHello: (name: string) => Effect.succeed(`Hello ${name}`),
       sayBye: (name: string) => Effect.succeed(`Bye ${name}`),
-      pingPong: (ping: string) => Effect.succeed("Pong"),
     },
   }
 ) {}
@@ -80,7 +78,7 @@ export class HelloService extends Effect.Service<HelloService>()(
 ### 3. Create a runtime for the client
 
 ```ts
-// src/lib/runtiem.ts
+// src/lib/runtime.ts
 import { makeRPCBackendLayer } from "effect-rpc";
 
 export const AppRuntime = ManagedRuntime.make(
@@ -94,17 +92,16 @@ export const AppRuntime = ManagedRuntime.make(
 ### 3. Expose the router via an API route (Next.js example)
 
 ```typescript
-// src/app/api/rpc/route.ts
+// src/app/api/hello/route.ts
+import { helloRouter } from "@/lib/rpc/hello/requests";
+import { HelloService } from "@/lib/rpc/hello/service";
 import { createRPCHandler } from "effect-rpc";
-import { HelloService } from "@/lib/rpc/hello";
-import { helloRouter } from "@/lib/rpc/service";
 
 const handler = createRPCHandler(
-  router,
+  helloRouter,
   {
     SayByeReq: ({ name }) => HelloService.sayBye(name),
     SayHelloReq: ({ name }) => HelloService.sayHello(name),
-    PingPongReq: (req) => HelloService.pingPong(req),
   },
   HelloService.Default
 );
@@ -124,24 +121,27 @@ export const POST = async (request: Request) => {
 #### 4.1 Using a hook in a client component
 
 ```jsx
-// src/app/page.tsx
+// src/components/greet-button.tsx
 "use client";
 
-import { useRPCRequest } from "effect-rpc/client";
-import { helloRouter } from "@/lib/rpc/service";
+import { helloRouter } from "@/lib/rpc/hello/requests";
 import { AppRuntime } from "@/lib/runtime";
+import { useRPCRequest } from "effect-rpc";
+import { Effect } from "effect";
 
 export function GreetUserButton() {
   const sayHello = useRPCRequest(helloRouter, "SayHelloReq");
 
   const greet = async () => {
-    const greetPhrase = await sayHello({ name: "Ben" }).pipe(
-      Effect.catchTag("SayHelloFailedError", (error) => {
-        toast.error("An error occured", { description: error.message });
-      }).pipe(AppRuntime.runPromise)
+    const greetPhraseProgram = sayHello({ name: "Ben" });
+    greetPhraseProgram.pipe(
+      Effect.catchTags({
+        SayHelloFailedError: (error) =>
+          Effect.succeed(`Error in SayHello: ${error.message}`),
+      })
     );
-
-    toast.info(greetPhrase);
+    const greetPhrase = await AppRuntime.runPromise(greetPhraseProgram);
+    alert(greetPhrase);
   };
 
   return <button onClick={greet}>Greet me!</button>;
@@ -155,13 +155,11 @@ export function GreetUserButton() {
 "use server";
 
 import { makeServerRequest } from "effect-rpc";
-import { helloRouter } from "@/lib/rpc/service";
-import { AppRuntime } from "@/lib/runtime";
+import { helloRouter } from "../rpc/hello/requests";
+import { AppRuntime } from "../runtime";
 
-export async function greetUser(): Promise<string> {
-  // Payload is passed so the function because the endpoint is invoked immediately.
+export async function greetUserServerSide(name: string): Promise<string> {
   const request = makeServerRequest(helloRouter, "SayHelloReq", { name });
-  // Request is now the return type of the "SayHelloReq" function, which is an Effect<string, SayHelloFailedError, never>
   return AppRuntime.runPromise(request);
 }
 ```
