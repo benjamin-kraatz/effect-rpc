@@ -4,7 +4,9 @@
   "description": "Monorepo for Effect RPC packages and examples",
   "scripts": {
     "check-types": "turbo check-types",
-    "publish-package": "pnpm --filter effect-rpc publish"
+    "publish-package": "pnpm --filter effect-rpc publish",
+    "example:nextjs": "turbo run example:nextjs && pnpm -F @effect-rpc/example-nextjs dev",
+    "example:tanstack": "turbo run example:tanstack && pnpm -F @effect-rpc/example-tanstack dev"
   },
   "packageManager": "pnpm@10.7.1",
   "devDependencies": {
