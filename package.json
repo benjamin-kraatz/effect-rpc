@@ -1,0 +1,29 @@
+{
+  "name": "effect-rpc",
+  "module": "index.ts",
+  "type": "module",
+  "version": "0.1.0",
+  "author": {
+    "name": "Benjamin Kraatz",
+    "email": "benjamin-kraatz@example.com"
+  },
+  "homepage": "https://github.com/benjamin-kraatz/effect-rpc",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "effect": "^3.17.1"
+  },
+  "devDependencies": {
+    "@effect/language-service": "^0.28.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
