@@ -22,7 +22,7 @@
   "homepage": "https://github.com/benjamin-kraatz/effect-rpc",
   "repository": {
     "type": "git",
-    "url": "https://github.com/benjamin-kraatz/effect-rpc.git",
+    "url": "git+https://github.com/benjamin-kraatz/effect-rpc.git",
     "directory": "packages/effect-rpc"
   },
   "exports": {
