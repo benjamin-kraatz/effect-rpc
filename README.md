@@ -121,6 +121,7 @@ export const POST = async (request: Request) => {
 ```jsx
 // src/app/page.tsx
 "use client";
+
 import { useRPCRequest } from "effect-rpc/client";
 import { helloRouter } from "@/lib/rpc/service";
 import { AppRuntime } from "@/lib/runtime";
@@ -141,6 +142,11 @@ export function GreetUserButton() {
   return <button onClick={greet}>Greet me!</button>;
 }
 ```
+
+## Example applications
+
+- [Next.js](./examples/nextjs)
+- [TanStack Start](./examples/tanstack-start/) (⚠️ Not fully complete yet)
 
 ## Why Effect RPC?
 
