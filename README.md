@@ -103,7 +103,7 @@ const handler = createRPCHandler(
     SayByeReq: ({ name }) => HelloService.sayBye(name),
     SayHelloReq: ({ name }) => HelloService.sayHello(name),
   },
-  HelloService.Default
+  { serviceLayers: HelloService.Default }
 );
 
 export const POST = async (request: Request) => {

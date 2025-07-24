@@ -1,5 +1,6 @@
 import { helloRouter } from "@/lib/rpc/hello/requests";
 import { HelloService } from "@/lib/rpc/hello/service";
+import { RpcSerialization } from "@effect/rpc";
 import { createRPCHandler } from "effect-rpc";
 
 const handler = createRPCHandler(
@@ -8,7 +9,10 @@ const handler = createRPCHandler(
     SayByeReq: ({ name }) => HelloService.sayBye(name),
     SayHelloReq: ({ name }) => HelloService.sayHello(name),
   },
-  HelloService.Default
+  {
+    serviceLayers: HelloService.Default,
+    serialization: RpcSerialization.layerMsgPack,
+  }
 );
 
 export const POST = async (request: Request) => {

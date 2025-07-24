@@ -9,7 +9,7 @@ const handler = createRPCHandler(
     SayByeReq: ({ name }) => HelloService.sayBye(name),
     SayHelloReq: ({ name }) => HelloService.sayHello(name),
   },
-  HelloService.Default
+  { serviceLayers: HelloService.Default }
 );
 
 export const ServerRoute = createServerFileRoute("/api/hello").methods({

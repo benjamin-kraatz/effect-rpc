@@ -1,14 +1,25 @@
-import { RpcClient, RpcGroup } from "@effect/rpc";
-import { Effect } from "effect";
+import { RpcClient, RpcGroup, RpcSerialization } from "@effect/rpc";
+import { Effect, Layer } from "effect";
+
+/**
+ * Type representing a serialization layer for RPC communication.
+ * It is just a wrapper around a `Layer` that provides the `RpcSerialization.RpcSerialization` type.
+ *
+ * @since 0.6.0
+ */
+export type SerializationLayer = Layer.Layer<
+  RpcSerialization.RpcSerialization,
+  never,
+  never
+>;
 
 /**
  * Infers the client type for a given RPC group.
  *
  * @template T - The type to infer the client from, expected to be an instance of `RpcGroup.RpcGroup`.
  */
-export type InferClient<T> = T extends RpcGroup.RpcGroup<infer R>
-  ? RpcClient.RpcClient<R>
-  : never;
+export type InferClient<T> =
+  T extends RpcGroup.RpcGroup<infer R> ? RpcClient.RpcClient<R> : never;
 
 /**
  * Gets an RPC client for a specific request within a given RPC group.
@@ -22,7 +33,7 @@ export type InferClient<T> = T extends RpcGroup.RpcGroup<infer R>
 export function getRPCClient<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends RpcGroup.RpcGroup<any>,
-  K extends keyof InferClient<T>
+  K extends keyof InferClient<T>,
 >(
   rpcGroup: T,
   requestName: K

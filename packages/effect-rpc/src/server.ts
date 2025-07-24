@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { RpcGroup, RpcServer } from "@effect/rpc";
+import { RpcGroup, RpcSerialization, RpcServer } from "@effect/rpc";
 import type { Context } from "@effect/rpc/Rpc";
 import { Effect, Layer } from "effect";
-import { getRPCClient, type InferClient } from "./helpers";
+import {
+  getRPCClient,
+  type InferClient,
+  type SerializationLayer,
+} from "./helpers";
 import { getServerLayers } from "./runtime";
 
 /**
@@ -13,6 +17,7 @@ import { getServerLayers } from "./runtime";
  *
  * @param router - The RPC router group defining all available endpoints.
  * @param rpcHandler - The Layer containing all endpoint implementations and their dependencies.
+ * @param serialization - (Optional) The serialization layer to use for RPC communication. Defaults to `RpcSerialization.layerNdjson`.
  * @param additionalLayers - (Optional) Additional Layer instances to merge into the environment.
  * @returns A function that takes a `Request` (and optional context) and returns a `Promise<Response>`.
  *
@@ -35,20 +40,30 @@ import { getServerLayers } from "./runtime";
  * // Or use the combined createRPCHandler function for a more streamlined approach:
  * // export const POST = createRPCHandler(router, { ... }, HelloService.Default);
  * ```
+ *
+ * @deprecated Use {@link createRPCHandler} for a more streamlined approach that combines route handler creation and server setup.
+ * This function is kept for backward compatibility but will be turned into an internal utility in the next minor version.
  */
 export function createServerHandler<
   T extends RpcGroup.RpcGroup<any>,
-  Routes = ExtractRoutes<T>
+  Routes = ExtractRoutes<T>,
 >(
   router: T,
   rpcHandler: Layer.Layer<Routes, never, never>,
+  serialization: SerializationLayer = RpcSerialization.layerNdjson,
   ...additionalLayers: Layer.Layer<any, any, never>[]
 ): (
   request: globalThis.Request,
   context?: Context<never> | undefined
 ) => Promise<Response> {
   const { handler } = RpcServer.toWebHandler(router, {
-    layer: Layer.mergeAll(rpcHandler, getServerLayers(), ...additionalLayers),
+    layer: Layer.mergeAll(
+      rpcHandler,
+      getServerLayers({
+        serialization,
+      }),
+      ...additionalLayers
+    ),
   });
 
   return handler;
@@ -73,9 +88,8 @@ type ExtractError<T> = T extends Effect.Effect<any, infer E, any> ? E : never;
  *
  * @internal
  */
-type ExtractRoutes<T> = T extends RpcGroup.RpcGroup<infer Routes>
-  ? Routes
-  : never;
+type ExtractRoutes<T> =
+  T extends RpcGroup.RpcGroup<infer Routes> ? Routes : never;
 
 /**
  * Maps each RPC request to its implementation.
@@ -86,7 +100,7 @@ type ExtractRoutes<T> = T extends RpcGroup.RpcGroup<infer Routes>
 type RequestImplementations<
   T extends RpcGroup.RpcGroup<any>,
   V extends InferClient<T>,
-  R
+  R,
 > = {
   readonly [P in keyof V]: (
     payload: Parameters<V[P]>[0]
@@ -124,11 +138,14 @@ type RequestImplementations<
  * // Pass to createServerHandler
  * export const POST = createServerHandler(router, handlers);
  * ```
+ *
+ * @deprecated Use {@link createRPCHandler} for a more streamlined approach that combines route handler creation and server setup.
+ * This function is kept for backward compatibility but will be turned into an internal utility in the next minor version.
  */
 export function createRouteHandler<
   T extends RpcGroup.RpcGroup<any>,
   V extends InferClient<T>,
-  R
+  R,
 >(
   router: T,
   reqImplementations: RequestImplementations<T, V, R>,
@@ -165,8 +182,10 @@ export function createRouteHandler<
  *
  * @param router - The RPC router group defining all available endpoints.
  * @param reqImplementations - An object mapping every endpoint name to its implementation. All endpoints are required.
- * @param serviceLayers - A Layer providing all dependencies required by the handlers (e.g., service implementations).
- * @param additionalLayers - (Optional) Additional Layer instances to merge into the environment.
+ * @param config - Configuration object
+ * @param config.serviceLayers - A Layer providing all dependencies required by the handlers (e.g., service implementations).
+ * @param config.serialization - (Optional) The serialization layer to use for RPC communication. Defaults to `RpcSerialization.layerNdjson`.
+ * @param config.additionalLayers - (Optional) Additional Layer instances to merge into the environment.
  * @returns A function that takes a `Request` (and optional context) and returns a `Promise<Response>`.
  *
  * @example
@@ -175,20 +194,44 @@ export function createRouteHandler<
  *   SayHelloReq: ({ name }) => HelloService.sayHello(name),
  *   SayByeReq: ({ name }) => HelloService.sayBye(name),
  *   PingPongReq: (req) => HelloService.pingPong(req),
- * }, HelloService.Default);
+ * }, {
+ *   serviceLayers: HelloService.Default,
+ * });
  *
  * export const POST = handler;
  * ```
+ *
+ * @since 0.3.0
  */
 export function createRPCHandler<
   T extends RpcGroup.RpcGroup<any>,
   V extends InferClient<T>,
-  R
+  R,
 >(
   router: T,
   reqImplementations: RequestImplementations<T, V, R>,
-  serviceLayers: Layer.Layer<R>,
-  ...additionalLayers: Layer.Layer<any, any, never>[]
+  config: {
+    /**
+     * The Layer providing all dependencies required by the handlers (e.g., service implementations).
+     * This is typically the default service layer for the service being used.
+     */
+    serviceLayers: Layer.Layer<R>;
+    /**
+     * The serialization layer to use for RPC communication.
+     * Defaults to `RpcSerialization.layerNdjson`.
+     * Must be of type {@link SerializationLayer}.
+     * If you use a custom serialization layer, make sure it is compatible with the RPC server you are communicating with.
+     * This means, you most likely want to modify the {@link createEffectRPC} function invocation to use the same serialization layer!
+     */
+    serialization?: SerializationLayer;
+    /**
+     * Additional Layer instances to merge into the environment.
+     * This can be used to provide additional dependencies required by the handlers,
+     * such as authentication middleware or other services.
+     * This is optional and can be omitted or an empty array if no additional layers are needed.
+     */
+    additionalLayers?: Layer.Layer<any, any, never>[];
+  }
 ): (
   request: globalThis.Request,
   context?: Context<never> | undefined
@@ -196,9 +239,14 @@ export function createRPCHandler<
   const routeHandlers = createRouteHandler(
     router,
     reqImplementations,
-    serviceLayers
+    config.serviceLayers
   );
-  return createServerHandler(router, routeHandlers, ...additionalLayers);
+  return createServerHandler(
+    router,
+    routeHandlers,
+    config.serialization,
+    ...(config.additionalLayers || [])
+  );
 }
 
 /**
@@ -223,10 +271,12 @@ export function createRPCHandler<
  * const userEffect = makeServerRequest(userRpcGroup, "getUser", { id: "123" });
  * // userEffect is an Effect representing the result of the getUser RPC method.
  * ```
+ *
+ * @since 0.3.0
  */
 export function makeServerRequest<
   T extends RpcGroup.RpcGroup<any>,
-  K extends keyof InferClient<T>
+  K extends keyof InferClient<T>,
 >(rpcGroup: T, requestName: K, payload: Parameters<InferClient<T>[K]>[0]) {
   const request = getRPCClient(rpcGroup, requestName);
   return request(payload);
