@@ -57,7 +57,7 @@ export function makeRPCBackendLayer(config: {
  *
  * @example
  * ```typescript
- * const backend = makeRPCBackendLayer({ url: "https://api.example.com", endpoint: "/rpc" });
+ * const backend = createEffectRPC({ url: "https://api.example.com", endpoint: "/rpc" });
  * ```
  *
  * @since 0.5.0
