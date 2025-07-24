@@ -5,8 +5,9 @@ export class HelloService extends Effect.Service<HelloService>()(
   {
     accessors: true,
     succeed: {
-      sayHello: (name: string) => Effect.succeed(`Hello ${name}`),
-      sayBye: (name: string) => Effect.succeed(`Bye ${name}`),
+      sayHello: (name: string) =>
+        Effect.succeed(`Hello from the backend, ${name}`),
+      sayBye: (name: string) => Effect.succeed(`Bye from the backend, ${name}`),
     },
   }
 ) {}

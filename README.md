@@ -167,7 +167,7 @@ export async function greetUserServerSide(name: string): Promise<string> {
 ## Example applications
 
 - [Next.js](./examples/nextjs)
-- [TanStack Start](./examples/tanstack-start/) (⚠️ Not fully complete yet)
+- [TanStack Start](./examples/tanstack-start/)
 
 ## Why Effect RPC?
 
