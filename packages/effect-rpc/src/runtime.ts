@@ -3,11 +3,6 @@ import { RpcClient, RpcSerialization } from "@effect/rpc";
 import * as Layer from "effect/Layer";
 
 /**
- *
- * @param config
- * @returns
- */
-/**
  * Creates an RPC backend layer using HTTP protocol.
  *
  * This function constructs a layered RPC client configured to communicate
@@ -30,11 +25,44 @@ import * as Layer from "effect/Layer";
  * ```typescript
  * const backend = makeRPCBackendLayer({ url: "https://api.example.com", endpoint: "/rpc" });
  * ```
+ *
+ * @deprecated Use {@link createEffectRPC} instead. It does the same thing, but with a more descriptive name.
  */
 export function makeRPCBackendLayer(config: {
   url: string;
   endpoint?: string;
 }) {
+  return createEffectRPC(config);
+}
+
+/**
+ * Creates an RPC backend layer using HTTP protocol.
+ *
+ * This function constructs a layered RPC client configured to communicate
+ * with a remote endpoint over HTTP. It uses the Fetch API for HTTP requests
+ * and NDJSON for request/response serialization.
+ *
+ * @param config - Configuration object for the RPC backend.
+ * @param config.url - The base URL of the RPC server.
+ * @param config.endpoint - (Optional) The specific endpoint path to append to the base URL.
+ *
+ * @returns A Layer instance that provides the configured RPC client.
+ *
+ * @remarks
+ * - The returned layer is composed with:
+ *   - `FetchHttpClient.layer` for HTTP transport using the Fetch API.
+ *   - `RpcSerialization.layerNdjson` for NDJSON serialization.
+ * - The endpoint is appended to the base URL if provided.
+ * - This function will allow for using custom serialization formats and protocols in the future.
+ *
+ * @example
+ * ```typescript
+ * const backend = makeRPCBackendLayer({ url: "https://api.example.com", endpoint: "/rpc" });
+ * ```
+ *
+ * @since 0.5.0
+ */
+export function createEffectRPC(config: { url: string; endpoint?: string }) {
   return RpcClient.layerProtocolHttp({
     url: `${config.url}${config.endpoint ?? ""}`,
   }).pipe(
@@ -58,7 +86,7 @@ export function makeRPCBackendLayer(config: {
  * - `FetchHttpClient.layer`: Supplies an HTTP client implementation based on the Fetch API.
  * - `HttpServer.layerContext`: Sets up the HTTP server context required for handling requests.
  * - Any additional layers passed via the `additionalLayers` parameter.
- * 
+ *
  * You should use these when you want to handle the RPC endpoints in Next.js Route Handlers.
  *
  * @param additionalLayers - An optional list of additional `Layer` instances to be merged with the default server layers.
