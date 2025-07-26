@@ -1,4 +1,5 @@
 import { Rpc, RpcGroup } from "@effect/rpc";
+import { createRequests } from "effect-rpc";
 import * as S from "effect/Schema";
 
 class SayHelloFailedError extends S.TaggedError<SayHelloFailedError>(
@@ -33,3 +34,8 @@ export const helloRouter = RpcGroup.make(
   Rpc.fromTaggedRequest(SayHelloReq),
   Rpc.fromTaggedRequest(SayByeReq)
 );
+
+const sayRequests = createRequests("SayHelloRequests", [
+  SayHelloReq,
+  SayByeReq,
+]);
