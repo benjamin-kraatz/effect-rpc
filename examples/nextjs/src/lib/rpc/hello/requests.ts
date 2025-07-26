@@ -35,7 +35,7 @@ export const helloRouter = RpcGroup.make(
   Rpc.fromTaggedRequest(SayByeReq)
 );
 
-const sayRequests = createRequests("SayHelloRequests", [
+const sayRequests = createRequests("@/hello/SayHelloRequests", [
   SayHelloReq,
   SayByeReq,
 ]);
