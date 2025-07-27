@@ -152,6 +152,37 @@ export function createRouteHandler<T extends RpcGroup.RpcGroup<any>, V extends I
 }
 
 /**
+ * Configuration object for the RPC handler.
+ * This is used to provide the service layers, serialization, and additional layers.
+ *
+ * @template R - The type of the environment required by the handlers.
+ *
+ * @since 0.3.0
+ */
+export type RPCHandlerConfig<R> = {
+  /**
+   * The Layer providing all dependencies required by the handlers (e.g., service implementations).
+   * This is typically the default service layer for the service being used.
+   */
+  serviceLayers: Layer.Layer<R>;
+  /**
+   * The serialization layer to use for RPC communication.
+   * Defaults to `RpcSerialization.layerNdjson`.
+   * Must be of type {@link SerializationLayer}.
+   * If you use a custom serialization layer, make sure it is compatible with the RPC server you are communicating with.
+   * This means, you most likely want to modify the {@link createEffectRPC} function invocation to use the same serialization layer!
+   */
+  serialization?: SerializationLayer;
+  /**
+   * Additional Layer instances to merge into the environment.
+   * This can be used to provide additional dependencies required by the handlers,
+   * such as authentication middleware or other services.
+   * This is optional and can be omitted or an empty array if no additional layers are needed.
+   */
+  additionalLayers?: Layer.Layer<any, any, never>[];
+};
+
+/**
  * Creates a web-compatible handler that combines route implementations and server setup in one function.
  *
  * This is a convenience function that internally calls both {@link createRouteHandler} and {@link createServerHandler}
@@ -183,28 +214,7 @@ export function createRouteHandler<T extends RpcGroup.RpcGroup<any>, V extends I
 export function createRPCHandler<T extends RpcGroup.RpcGroup<any>, V extends InferClient<T>, R>(
   router: T,
   reqImplementations: RequestImplementations<T, V, R>,
-  config: {
-    /**
-     * The Layer providing all dependencies required by the handlers (e.g., service implementations).
-     * This is typically the default service layer for the service being used.
-     */
-    serviceLayers: Layer.Layer<R>;
-    /**
-     * The serialization layer to use for RPC communication.
-     * Defaults to `RpcSerialization.layerNdjson`.
-     * Must be of type {@link SerializationLayer}.
-     * If you use a custom serialization layer, make sure it is compatible with the RPC server you are communicating with.
-     * This means, you most likely want to modify the {@link createEffectRPC} function invocation to use the same serialization layer!
-     */
-    serialization?: SerializationLayer;
-    /**
-     * Additional Layer instances to merge into the environment.
-     * This can be used to provide additional dependencies required by the handlers,
-     * such as authentication middleware or other services.
-     * This is optional and can be omitted or an empty array if no additional layers are needed.
-     */
-    additionalLayers?: Layer.Layer<any, any, never>[];
-  },
+  config: RPCHandlerConfig<R>,
 ): (request: globalThis.Request, context?: Context<never> | undefined) => Promise<Response> {
   const routeHandlers = createRouteHandler(router, reqImplementations, config.serviceLayers);
   return createServerHandler(
