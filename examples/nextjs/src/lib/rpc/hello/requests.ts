@@ -30,4 +30,5 @@ export const helloRouter = RpcGroup.make(
   Rpc.fromTaggedRequest(SayByeReq),
 );
 
-export const helloRequests = createRpcGroupRegistry().registerGetGroup('hello', helloRouter);
+const helloReg = createRpcGroupRegistry();
+export const helloRequests = helloReg.registerGetGroup('hello', helloRouter);

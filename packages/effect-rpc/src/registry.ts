@@ -1,5 +1,7 @@
 import { RpcGroup } from '@effect/rpc';
+import type { Context } from '@effect/rpc/Rpc';
 import { type InferClient, makeRPCRequest } from './helpers';
+import { createRPCHandler, type RequestImplementations, type RPCHandlerConfig } from './server';
 
 type RegistryKey = string;
 
@@ -52,6 +54,11 @@ export type TaggedRPCGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<an
     name: N,
     payload: Parameters<InferClient<V>[N]>[0],
   ) => ReturnType<InferClient<V>[N]>;
+
+  createServerHandler: <R>(
+    requestImplementations: RequestImplementations<V, InferClient<V>, R>,
+    config: RPCHandlerConfig<R>,
+  ) => (request: globalThis.Request, context?: Context<never> | undefined) => Promise<Response>;
 };
 
 /**
@@ -78,9 +85,18 @@ function createTaggedRPCGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup
       const request = makeRPCRequest(groups, name);
       return request(payload);
     },
-  };
+    createServerHandler(requestImplementations, config) {
+      return (request: globalThis.Request, context?: Context<never> | undefined) => {
+        return createRPCHandler(
+          groups,
+          requestImplementations,
+          config,
+        )(request, context) as Promise<Response>;
+      };
+    },
+  } as TaggedRPCGroup<K, V>;
 
-  return taggedGroup as TaggedRPCGroup<K, V>;
+  return taggedGroup;
 }
 
 /**

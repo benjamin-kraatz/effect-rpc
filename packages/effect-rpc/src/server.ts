@@ -84,9 +84,13 @@ type ExtractRoutes<T> = T extends RpcGroup.RpcGroup<infer Routes> ? Routes : nev
  * Maps each RPC request to its implementation.
  * This type is used to ensure that all endpoints in the router are implemented.
  *
- * @internal
+ * @since 0.5.0
  */
-type RequestImplementations<T extends RpcGroup.RpcGroup<any>, V extends InferClient<T>, R> = {
+export type RequestImplementations<
+  T extends RpcGroup.RpcGroup<any>,
+  V extends InferClient<T>,
+  R,
+> = {
   readonly [P in keyof V]: (
     payload: Parameters<V[P]>[0],
   ) => Effect.Effect<ExtractSuccess<ReturnType<V[P]>>, ExtractError<ReturnType<V[P]>>, R>;
