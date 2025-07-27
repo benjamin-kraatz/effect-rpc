@@ -296,23 +296,21 @@ type TaggedRequest<R> = {
 };
 
 const __globalRequestMapping = new Map<string, TaggedRequest<any>[]>();
-
 type Tag = string;
 
 // This will hold the actual type mapping at runtime
 const __globalGroupMapping = new Map<Tag, RpcGroup.RpcGroup<any>>();
 
-
 // Legacy global functions for backward compatibility
 /**
  * Creates and registers an RPC handler with a specific tag.
- * 
+ *
  * @deprecated Consider using createHandlerRegistry() for better type safety without module augmentation.
- * 
+ *
  * @param tag - Unique identifier for the RPC handler
  * @param rpcGroup - The RPC group/router to register
  * @returns The same RPC group that was passed in
- * 
+ *
  * @example
  * ```typescript
  * const helloHandler = createHandler('flamingo', helloRouter);
@@ -322,8 +320,13 @@ export function createHandler<T extends RpcGroup.RpcGroup<any>, TagName extends 
   tag: TagName,
   rpcGroup: T,
 ): T;
-
-// Implementation
+/**
+ * Creates and registers an RPC handler with a specific tag.
+ *
+ * @param tag - Unique identifier for the RPC handler.
+ * @param rpcGroup - The RPC group/router to register.
+ * @returns The same RPC group that was passed in.
+ */
 export function createHandler<T extends RpcGroup.RpcGroup<any>>(tag: Tag, rpcGroup: T) {
   if (__globalGroupMapping.has(tag)) {
     throw new Error(`RPC group with tag "${tag}" already exists`);
@@ -334,12 +337,12 @@ export function createHandler<T extends RpcGroup.RpcGroup<any>>(tag: Tag, rpcGro
 
 /**
  * Retrieves a previously registered RPC handler by its tag.
- * 
+ *
  * @deprecated Consider using createHandlerRegistry() for better type safety without module augmentation.
- * 
+ *
  * @param tag - The tag used when the handler was created
  * @returns The RPC handler associated with the tag (returns RpcGroup.RpcGroup<any>)
- * 
+ *
  * @example
  * ```typescript
  * const handler = getHandler('flamingo'); // RpcGroup.RpcGroup<any>

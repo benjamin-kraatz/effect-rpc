@@ -26,9 +26,10 @@ export type TaggedRPCGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<an
    *
    * @since 0.8.0
    *
-   * @deprecated This will be removed in future versions.
-   * Use `getRequest` to access specific requests directly.
-   * There's no need to get all request names at once.
+   * @deprecated Since 0.8.0. This method will be removed in version 0.9.0.
+   * Use `getRequest` to access specific requests directly instead of retrieving all request names.
+   * Migration: Replace calls to `getRequests()` with individual calls to `getRequest(name, payload)`,
+   * where `name` is the request name and `payload` is the required input for that request.
    */
   getRequests: () => Array<V extends { requests: ReadonlyMap<string, infer R> } ? R : never>;
 
@@ -74,7 +75,7 @@ export type TaggedRPCGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<an
    * import { helloRequests } from './requests';
    * import { HelloService } from './service';
    * import { RpcSerialization } from '@effect/rpc';
-   * 
+   *
    * const handler = helloRequests.createServerHandler(
    *   {
    *     SayByeReq: ({ name }) => HelloService.sayBye(name),
