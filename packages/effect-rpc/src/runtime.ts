@@ -1,5 +1,5 @@
 import { FetchHttpClient, HttpServer } from '@effect/platform';
-import { RpcClient, RpcSerialization } from '@effect/rpc';
+import { Rpc, RpcClient, RpcGroup, RpcSerialization } from '@effect/rpc';
 import * as Layer from 'effect/Layer';
 import * as Schema from 'effect/Schema';
 import type { SerializationLayer } from './helpers';
@@ -203,51 +203,73 @@ export function getServerLayers(
 }
 
 /**
- * Creates an array of tagged requests for RPC communication for a given namespace tag.
- * It allows you to globally register requests to re-use them across your application,
- * for example, when you do actual requests to the server with the RPC client.
- *
- * **NOTE**: requests are stored globally in memory, and the {@link tag} _must_ be unique.
- * If you create requests with the same tag, it will throw an error.
- * Best practice is to use an import-path-style string, such as `@/main/MyRequests`,
- * or the file path of the file where the requests are defined.
- *
- * For type safety with makeRequest, consider augmenting the GlobalRequestRegistry:
+ * A simple type-safe request registry that doesn't require module augmentation.
+ * The type safety is achieved through the return type of createRequests.
+ */
+export interface RequestRegistry<T extends Record<string, any> = Record<string, any>> {
+  makeRequest<K extends keyof T>(name: K): T[K];
+  getTag(): string;
+}
+
+/**
+ * Creates a type-safe registry of tagged requests for RPC communication.
+ * Returns a registry object with a makeRequest method that provides full type safety.
  *
  * @example
  * ```typescript
- * declare module "effect-rpc" {
- *   interface GlobalRequestRegistry {
- *     "@/hello/SayHelloRequests": "SayHelloReq" | "SayByeReq";
- *   }
- * }
+ * const helloRequests = createRequests("@/hello/SayHelloRequests", {
+ *   SayHelloReq,
+ *   SayByeReq,
+ * });
  *
- * const requests = createRequests("@/hello/SayHelloRequests", [SayHelloReq, SayByeReq]);
- * // Now makeRequest("@/hello/SayHelloRequests", "SayHelloReq") is type-safe
+ * // Fully type-safe - TypeScript knows this returns SayHelloReq
+ * const request = helloRequests.makeRequest("SayHelloReq");
  * ```
  *
  * @param tag - The tag to identify the requests.
- * @param requests - The array of requests to create.
- * @returns An array of tagged requests.
- * @throws Error if a request with the same tag already exists in the global request mapping.
+ * @param requests - An object mapping request names to request constructors.
+ * @returns A type-safe registry with a makeRequest method.
+ * @throws Error if a request with the same tag already exists.
  *
  * @since 0.7.0
  */
-export function createRequests<R, E, I>(tag: string, requests: R[]): TaggedRequest<R>[] {
-  for (const request of requests) {
-    if (__globalRequestMapping.has(tag)) {
-      throw new Error(`Request already exists in request mapping "${tag}"`);
-    }
-    __globalRequestMapping.set(tag, [
-      ...(__globalRequestMapping.get(tag) ?? []),
-      request as TaggedRequest<R>,
-    ]);
+export function createRequests<T extends Record<string, any>>(
+  tag: string,
+  requests: T,
+): RequestRegistry<T> {
+  if (__globalRequestMapping.has(tag)) {
+    throw new Error(`Request already exists in request mapping "${tag}"`);
   }
 
-  return __globalRequestMapping.get(tag) as TaggedRequest<R>[];
+  const requestArray = Object.entries(requests).map(([name, request]) => ({
+    ...request,
+    _tag: name,
+  })) as TaggedRequest<any>[];
+
+  __globalRequestMapping.set(tag, requestArray);
+
+  return {
+    makeRequest<K extends keyof T>(name: K): T[K] {
+      const mapping = __globalRequestMapping.get(tag);
+      if (!mapping) {
+        throw new Error(`No requests found for tag "${tag}"`);
+      }
+
+      const request = mapping.find((req) => req._tag === (name as string));
+      if (!request) {
+        throw new Error(`Request "${name as string}" not found for tag "${tag}"`);
+      }
+      return request as T[K];
+    },
+    getTag() {
+      return tag;
+    },
+  };
 }
 
 type TaggedRequest<R> = {
+  _tag: string;
+} & {
   [K in keyof R]: R[K] extends Schema.TaggedRequest<
     infer Tag,
     infer A,
@@ -275,40 +297,128 @@ type TaggedRequest<R> = {
 
 const __globalRequestMapping = new Map<string, TaggedRequest<any>[]>();
 
+type Tag = string;
+
+// This will hold the actual type mapping at runtime
+const __globalGroupMapping = new Map<Tag, RpcGroup.RpcGroup<any>>();
+
 /**
- * Global registry interface for mapping tags to their request names.
- * This allows for type-safe request names in makeRequest.
- *
- * Users should augment this interface with string literal types representing their request names:
- *
+ * Creates a type-safe handler registry that maintains type relationships without module augmentation.
+ * Uses a builder pattern to accumulate handlers and their types.
+ * 
+ * @returns An object with methods to register and retrieve handlers with full type safety
+ * 
  * @example
  * ```typescript
- * declare module "effect-rpc" {
- *   interface GlobalRequestRegistry {
- *     "@/hello/SayHelloRequests": "SayHelloReq" | "SayByeReq";
- *   }
- * }
+ * const registry = createHandlerRegistry()
+ *   .register('flamingo', helloRouter)
+ *   .register('users', userRouter);
+ * 
+ * const helloHandler = registry.get('flamingo');
+ * //    ^ Type: typeof helloRouter (fully type-safe!)
+ * 
+ * const userHandler = registry.get('users');
+ * //    ^ Type: typeof userRouter (fully type-safe!)
  * ```
  */
-export interface GlobalRequestRegistry {
-  // This will be augmented by module declaration merging
+export function createHandlerRegistry() {
+  function createRegistryWithHandlers<T extends Record<string, RpcGroup.RpcGroup<any>>>(handlers: T) {
+    const registry = {
+      /**
+       * Register a new handler with the given tag
+       */
+      register<K extends string, V extends RpcGroup.RpcGroup<any>>(
+        tag: K extends keyof T ? never : K,
+        handler: V
+      ) {
+        if (tag in handlers) {
+          throw new Error(`RPC group with tag "${tag}" already exists`);
+        }
+        
+        const newHandlers = { ...handlers, [tag]: handler } as T & Record<K, V>;
+        // Also register globally for backward compatibility
+        __globalGroupMapping.set(tag, handler);
+        
+        return createRegistryWithHandlers(newHandlers);
+      },
+      
+      /**
+       * Get a handler by its tag with full type safety
+       */
+      get<K extends keyof T>(tag: K): T[K] {
+        if (!(tag in handlers)) {
+          throw new Error(`RPC group with tag "${String(tag)}" not found`);
+        }
+        return handlers[tag];
+      },
+      
+      /**
+       * Check if a handler exists
+       */
+      has<K extends string>(tag: K): tag is K & keyof T {
+        return tag in handlers;
+      },
+      
+      /**
+       * Get all registered tags
+       */
+      getTags(): (keyof T)[] {
+        return Object.keys(handlers) as (keyof T)[];
+      }
+    };
+    
+    return registry;
+  }
+  
+  return createRegistryWithHandlers({});
+}
+
+// Legacy global functions for backward compatibility
+/**
+ * Creates and registers an RPC handler with a specific tag.
+ * 
+ * @deprecated Consider using createHandlerRegistry() for better type safety without module augmentation.
+ * 
+ * @param tag - Unique identifier for the RPC handler
+ * @param rpcGroup - The RPC group/router to register
+ * @returns The same RPC group that was passed in
+ * 
+ * @example
+ * ```typescript
+ * const helloHandler = createHandler('flamingo', helloRouter);
+ * ```
+ */
+export function createHandler<T extends RpcGroup.RpcGroup<any>, TagName extends string>(
+  tag: TagName,
+  rpcGroup: T,
+): T;
+
+// Implementation
+export function createHandler<T extends RpcGroup.RpcGroup<any>>(tag: Tag, rpcGroup: T) {
+  if (__globalGroupMapping.has(tag)) {
+    throw new Error(`RPC group with tag "${tag}" already exists`);
+  }
+  __globalGroupMapping.set(tag, rpcGroup);
+  return rpcGroup;
 }
 
 /**
- * Gets the valid request names for a given tag.
- * If the tag exists in GlobalRequestRegistry, returns the union of request names.
- * Otherwise, falls back to string.
+ * Retrieves a previously registered RPC handler by its tag.
+ * 
+ * @deprecated Consider using createHandlerRegistry() for better type safety without module augmentation.
+ * 
+ * @param tag - The tag used when the handler was created
+ * @returns The RPC handler associated with the tag (returns RpcGroup.RpcGroup<any>)
+ * 
+ * @example
+ * ```typescript
+ * const handler = getHandler('flamingo'); // RpcGroup.RpcGroup<any>
+ * ```
  */
-type RequestNamesForTag<Tag extends string> = Tag extends keyof GlobalRequestRegistry
-  ? GlobalRequestRegistry[Tag]
-  : string;
-
-export async function makeRequest<Tag extends string>(
-  tag: Tag,
-  requestName: RequestNamesForTag<Tag>,
-) {
-  const mapping = __globalRequestMapping.get(tag);
-  if (!mapping) {
-    throw new Error(`No requests found for tag "${tag}"`);
+export function getHandler(tag: string): RpcGroup.RpcGroup<any> {
+  const handler = __globalGroupMapping.get(tag);
+  if (!handler) {
+    throw new Error(`RPC group with tag "${tag}" not found`);
   }
+  return handler;
 }
