@@ -1,6 +1,5 @@
-import { Rpc, RpcClient, RpcGroup } from '@effect/rpc';
-import * as Effect from 'effect/Effect';
-import { type InferClient } from './helpers';
+import { RpcGroup } from '@effect/rpc';
+import { type InferClient, makeRPCRequest } from './helpers';
 
 type RegistryKey = string;
 
@@ -19,9 +18,10 @@ export type TaggedHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<any
   tag: K;
   handlers: V;
   getRequests: () => Array<V extends { requests: ReadonlyMap<string, infer R> } ? R : never>;
-  getRequest: <N extends keyof InferClient<V>, R extends RpcClient.Protocol>(
+  getRequest: <N extends keyof InferClient<V>>(
     name: N,
-  ) => Effect.Effect<InferClient<V>[N], never, R>;
+    payload: Parameters<InferClient<V>[N]>[0],
+  ) => ReturnType<InferClient<V>[N]>;
 };
 
 /**
@@ -32,7 +32,7 @@ function createTaggedHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<
   tag: K,
   handler: V,
 ): TaggedHandler<K, V> {
-  return {
+  const taggedHandler = {
     tag,
     handlers: handler,
     getRequests: () => {
@@ -41,21 +41,21 @@ function createTaggedHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<
         V extends { requests: ReadonlyMap<string, infer R> } ? R : never
       >;
     },
-    getRequest: <N extends keyof InferClient<V>, R extends RpcClient.Protocol>(name: N) => {
-      return Effect.gen(function* () {
-        const client = yield* RpcClient.make(handler);
-        if (!(name in client)) {
-          throw new Error(`Request "${String(name)}" not found`);
-        }
-        return client[name] as InferClient<V>[N];
-      }).pipe(Effect.scoped) as Effect.Effect<InferClient<V>[N], never, R>;
+    getRequest: <N extends keyof InferClient<V>>(
+      name: N,
+      payload: Parameters<InferClient<V>[N]>[0],
+    ) => {
+      const request = makeRPCRequest(handler, name);
+      return request(payload);
     },
   };
+
+  return taggedHandler as TaggedHandler<K, V>;
 }
 
 /**
  * Creates a type-safe handler registry that maintains exact type relationships.
- * 
+ *
  * This is the recommended way to achieve full type safety. The registry uses a builder
  * pattern to accumulate handlers and maintain their types without any global state.
  *
@@ -76,7 +76,9 @@ function createTaggedHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<
  *
  * @since 0.8.0
  */
-export function createHandlerRegistry<T extends Record<RegistryKey, RpcGroup.RpcGroup<any>> = {}>() {
+export function createRpcGroupRegistry<
+  T extends Record<RegistryKey, RpcGroup.RpcGroup<any>> = {},
+>() {
   function createRegistryWithHandlers<T extends Record<RegistryKey, RpcGroup.RpcGroup<any>>>(
     handlers: T,
   ) {
@@ -84,7 +86,7 @@ export function createHandlerRegistry<T extends Record<RegistryKey, RpcGroup.Rpc
       /**
        * Register a new handler with the given tag
        */
-      register<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
+      registerGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
         tag: K extends keyof T ? never : K,
         handler: V,
       ) {
@@ -94,6 +96,13 @@ export function createHandlerRegistry<T extends Record<RegistryKey, RpcGroup.Rpc
 
         const newHandlers = { ...handlers, [tag]: handler } as T & Record<K, V>;
         return createRegistryWithHandlers(newHandlers);
+      },
+      registerGetGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
+        tag: K extends keyof T ? never : K,
+        handler: V,
+      ) {
+        const a = registry.registerGroup(tag, handler);
+        return a.get(tag);
       },
 
       /**
@@ -147,7 +156,7 @@ export function createHandlerRegistry<T extends Record<RegistryKey, RpcGroup.Rpc
  *   Rpc.fromTaggedRequest(SayHelloReq),
  *   Rpc.fromTaggedRequest(SayByeReq),
  * );
- * 
+ *
  * const flamingoHandler = registerHandler('flamingo', helloRouter);
  * ```
  *
@@ -160,16 +169,16 @@ export function registerHandler<K extends RegistryKey, V extends RpcGroup.RpcGro
   if (__globalRegistry.has(tag)) {
     throw new Error(`RPC group with tag "${tag}" already exists`);
   }
-  
+
   const taggedHandler = createTaggedHandler(tag, handler);
   __globalRegistry.set(tag, taggedHandler);
-  
+
   return taggedHandler;
 }
 
 /**
  * Retrieves a registered handler from the global registry.
- * 
+ *
  * Note: For full type safety, consider using `createHandlerRegistry()` instead.
  * This global retrieval approach provides runtime functionality but limited type safety.
  *
@@ -181,12 +190,10 @@ export function registerHandler<K extends RegistryKey, V extends RpcGroup.RpcGro
  * const handler = getHandler('flamingo');
  * ```
  */
-export function getHandler<K extends string>(
-  name: K,
-): TaggedHandler<K, RpcGroup.RpcGroup<any>> {
-  const handler = __globalRegistry.get(name);
-  if (!handler) {
-    throw new Error(`RPC group with tag "${name}" not found`);
-  }
-  return handler;
-}
+// export function getHandler<K extends string>(name: K): TaggedHandler<K, RpcGroup.RpcGroup<any>> {
+//   const handler = __globalRegistry.get(name);
+//   if (!handler) {
+//     throw new Error(`RPC group with tag "${name}" not found`);
+//   }
+//   return handler;
+// }

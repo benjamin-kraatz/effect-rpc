@@ -6,7 +6,7 @@ export const AppRuntime = ManagedRuntime.make(
   Layer.mergeAll(
     createEffectRPC({
       url: 'http://localhost:3000/api/hello',
-      serialization: RpcSerialization.layerMsgPack,
+      serialization: RpcSerialization.layerNdjson,
     }),
     // AuthClientLive // if there's an auth middleware, for example
   ),

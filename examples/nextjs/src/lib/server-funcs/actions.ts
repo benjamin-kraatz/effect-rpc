@@ -1,12 +1,18 @@
 'use server';
 
-import { makeServerRequest } from 'effect-rpc';
-import { helloRouter } from '../rpc/hello/requests';
+import { helloRequests } from '../rpc/hello/requests';
 import { AppRuntime } from '../runtime';
-import { sayRequests } from '../rpc/hello/requests';
 
 export async function greetUserServerSide(name: string): Promise<string> {
-  const mr = sayRequests.makeRequest('SayHelloReq');
-  const request = makeServerRequest(helloRouter, 'SayHelloReq', { name });
-  return AppRuntime.runPromise(request);
+  // Use makeServerRequest for server-side RPC calls without HTTP
+  const program = helloRequests.getRequest('SayHelloReq', { name });
+
+  try {
+    const result = await AppRuntime.runPromise(program);
+    console.log('Server-side RPC result:', result);
+    return result;
+  } catch (error) {
+    console.error('Error in greetUserServerSide:', error);
+    throw new Error('Failed to greet user');
+  }
 }
