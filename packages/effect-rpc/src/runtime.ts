@@ -2,6 +2,7 @@ import { FetchHttpClient, HttpServer } from '@effect/platform';
 import { RpcClient, RpcSerialization } from '@effect/rpc';
 import * as Layer from 'effect/Layer';
 import type { SerializationLayer } from './helpers';
+import { ManagedRuntime } from 'effect';
 
 /**
  * Creates an RPC backend layer using HTTP protocol.
@@ -88,6 +89,54 @@ export function createEffectRPC(config: {
       FetchHttpClient.layer,
       config.serialization ?? RpcSerialization.layerNdjson,
     ]),
+  );
+}
+
+/**
+ * Creates a Effect Runtime for RPC communication with a specified URL and optional serialization.
+ * This function is useful for setting up a runtime environment without sticking it together with
+ * all the other parts.
+ * It's a convenience function over {@link createEffectRPC} and {@link getServerLayers} and potentially others.
+ *
+ * You can give it any additional layers that the runtime should have.
+ *
+ * @param config - Configuration object for the RPC runtime.
+ * @param config.url - The base URL of the RPC server.
+ * @param config.serialization - (Optional) Custom serialization layer to use for RPC communication of type `SerializationLayer`.
+ * Defaults to `RpcSerialization.layerNdjson`.
+ * @param config.additionalLayers - (Optional) Additional layers to merge with the RPC client layer.
+ *
+ * @see {@link createEffectRPC}
+ * @see {@link getServerLayers}
+ *
+ * @example
+ * ```typescript
+ * const runtime = createRuntime({
+ *   url: "https://my-rpc-server.com",
+ *   serialization: MyCustomSerializationLayer,
+ *   additionalLayers: [MyCustomLayer]
+ * });
+ * ```
+ *
+ * @since 0.7.0
+ */
+export function createRuntime<R, E>({
+  url,
+  serialization,
+  additionalLayers,
+}: {
+  url: string;
+  serialization?: SerializationLayer;
+  additionalLayers?: Layer.Layer<R, E, never>[];
+}): ManagedRuntime.ManagedRuntime<RpcClient.Protocol | R, E> {
+  return ManagedRuntime.make(
+    Layer.mergeAll(
+      createEffectRPC({
+        url,
+        serialization: serialization ?? RpcSerialization.layerNdjson,
+      }),
+      ...(additionalLayers ?? []),
+    ),
   );
 }
 
