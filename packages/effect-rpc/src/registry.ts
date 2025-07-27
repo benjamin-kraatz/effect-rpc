@@ -4,12 +4,6 @@ import { type InferClient, makeRPCRequest } from './helpers';
 type RegistryKey = string;
 
 /**
- * Internal registry to store runtime handlers
- * @internal
- */
-const __globalRegistry = new Map<string, any>();
-
-/**
  * Type representing a tagged handler with methods to access requests and perform RPC calls.
  *
  * @since 0.8.0
