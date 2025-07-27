@@ -2,7 +2,7 @@
 import { RpcGroup, RpcSerialization, RpcServer } from '@effect/rpc';
 import type { Context } from '@effect/rpc/Rpc';
 import { Effect, Layer } from 'effect';
-import { getRPCClient, type InferClient, type SerializationLayer } from './helpers';
+import { makeRPCRequest, type InferClient, type SerializationLayer } from './helpers';
 import { getServerLayers } from './runtime';
 
 /**
@@ -245,6 +245,6 @@ export function makeServerRequest<T extends RpcGroup.RpcGroup<any>, K extends ke
   requestName: K,
   payload: Parameters<InferClient<T>[K]>[0],
 ) {
-  const request = getRPCClient(rpcGroup, requestName);
+  const request = makeRPCRequest(rpcGroup, requestName);
   return request(payload);
 }

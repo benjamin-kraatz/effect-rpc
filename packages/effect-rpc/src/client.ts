@@ -1,5 +1,5 @@
 import { RpcGroup } from '@effect/rpc';
-import { getRPCClient, type InferClient } from './helpers';
+import { makeRPCRequest, type InferClient } from './helpers';
 
 /**
  * Creates a function to perform an RPC request using the provided RPC group and request name.
@@ -34,5 +34,5 @@ export function useRPCRequest<
   rpcGroup: T,
   requestName: K,
 ): (payload: Parameters<InferClient<T>[K]>[0]) => ReturnType<InferClient<T>[K]> {
-  return getRPCClient(rpcGroup, requestName);
+  return makeRPCRequest(rpcGroup, requestName);
 }
