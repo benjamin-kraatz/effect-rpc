@@ -7,6 +7,7 @@
     "publish-package": "pnpm --filter effect-rpc publish",
     "example:nextjs": "turbo run example:nextjs && pnpm -F @effect-rpc/example-nextjs dev",
     "example:tanstack": "turbo run example:tanstack && pnpm -F @effect-rpc/example-tanstack dev",
+    "ci:add-change": "changeset",
     "ci:version": "changeset version",
     "ci:publish": "changeset publish"
   },
