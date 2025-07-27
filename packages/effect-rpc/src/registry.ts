@@ -17,7 +17,43 @@ const __globalRegistry = new Map<string, any>();
 export type TaggedHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>> = {
   tag: K;
   handlers: V;
+  /**
+   * Returns all request names available in this handler.
+   * This is useful for introspection or dynamic request handling.
+   * @returns Array of requests available in this handler
+   *
+   * @example
+   * ```typescript
+   * const requests = handler.getRequests();
+   * // requests is an array of all request objects available in this handler
+   * ```
+   *
+   * @since 0.8.0
+   *
+   * @deprecated This will be removed in future versions.
+   * Use `getRequest` to access specific requests directly.
+   * There's no need to get all request names at once.
+   */
   getRequests: () => Array<V extends { requests: ReadonlyMap<string, infer R> } ? R : never>;
+
+  /**
+   * Gets a specific request by name.
+   *
+   * It can be used to send it to the custom runtime to execute the request.
+   *
+   * @param name - The name of the request to retrieve.
+   * @param payload - The payload to send with the request.
+   * @returns The response from the request.
+   *
+   * @example
+   * ```typescript
+   * const request = handler.getRequest('SayHelloReq', { name: 'Alice' });
+   * // request is an Effect that, when run, will perform the RPC call and return the response.
+   * const result = await AppRuntime.runPromise(request); // result is the response from the RPC call
+   * ```
+   *
+   * @since 0.8.0
+   */
   getRequest: <N extends keyof InferClient<V>>(
     name: N,
     payload: Parameters<InferClient<V>[N]>[0],
@@ -58,6 +94,9 @@ function createTaggedHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<
  *
  * This is the recommended way to achieve full type safety. The registry uses a builder
  * pattern to accumulate handlers and maintain their types without any global state.
+ *
+ * You can use it to manage all requests and handlers in a type-safe manner,
+ * and access the requests directly without needing to know all request names or the router.
  *
  * @returns A registry object with methods to register and retrieve handlers with full type safety
  *

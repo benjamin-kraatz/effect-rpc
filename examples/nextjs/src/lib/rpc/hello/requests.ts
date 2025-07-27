@@ -1,5 +1,5 @@
 import { Rpc, RpcGroup } from '@effect/rpc';
-import { createHandler, createRequests, createRpcGroupRegistry, getHandler } from 'effect-rpc';
+import { createRpcGroupRegistry } from 'effect-rpc';
 import * as S from 'effect/Schema';
 
 class SayHelloFailedError extends S.TaggedError<SayHelloFailedError>('SayHelloFailedError')(

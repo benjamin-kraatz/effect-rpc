@@ -1,6 +1,5 @@
-import { Rpc, RpcClient, RpcGroup, RpcSerialization } from '@effect/rpc';
+import { RpcClient, RpcGroup, RpcSerialization } from '@effect/rpc';
 import { Effect, Layer } from 'effect';
-import type { TaggedHandler } from './registry';
 
 /**
  * Type representing a serialization layer for RPC communication.
@@ -46,28 +45,4 @@ export function makeRPCRequest<
 
     return program;
   };
-}
-
-// export function makeRPCRequestWithTaggedHandler<THandler extends Effect.Effect<any, any, any>>(
-//   taggedHandler: Effect.Effect<THandler, any, any>,
-//   // payload: Parameters<THandler>[0],
-// ) {
-//   return Effect.gen(function* () {
-//     return yield* taggedHandler;
-//   }).pipe(Effect.scoped);
-// }
-
-export function makeRPCRequestWithTaggedHandler<
-  V extends RpcGroup.RpcGroup<any>,
-  N extends keyof InferClient<V>,
-  THandler extends (...args: Parameters<InferClient<V>[N]>[0]) => ReturnType<InferClient<V>[N]>,
->(taggedHandler: THandler): Effect.Effect<ReturnType<InferClient<V>[N]>, any, any> {
-  const res = taggedHandler({ name: 'Sebse' });
-  console.log('RES RES', taggedHandler);
-  return Effect.gen(function* () {
-    yield* Effect.log(`Making RPC request with payload!`);
-    const res = yield* taggedHandler({ name: 'Sebse' });
-    yield* Effect.log(`Response received:`, res);
-    return res;
-  }).pipe();
 }
