@@ -90,6 +90,99 @@ function createTaggedHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<
 }
 
 /**
+ * Represents a registry for managing groups of RPC handlers, providing type-safe operations
+ * for registering, retrieving, and querying handler groups by their unique tags.
+ *
+ * @template T - A record mapping registry keys to their corresponding {@link RpcGroup.RpcGroup} instances.
+ *
+ * @since 0.8.0
+ */
+export type RpcGroupRegistry<T extends Record<RegistryKey, RpcGroup.RpcGroup<any>>> = {
+  /**
+   * Registers a new RPC handler group under the specified tag.
+   * The tag must not already exist in the registry.
+   *
+   * @typeParam K - The unique tag for the handler group.
+   * @typeParam V - The handler group instance to register.
+   * @param tag - The unique identifier for the handler group. Must not already exist in the registry.
+   * @param handler - The handler group instance to register.
+   * @returns A new {@link RpcGroupRegistry} instance including the newly registered group.
+   */
+  registerGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
+    tag: K extends keyof T ? never : K,
+    handler: V,
+  ): RpcGroupRegistry<T & Record<K, V>>;
+
+  /**
+   * Registers a new RPC handler group and immediately returns the registered handler for the given tag.
+   * The tag must not already exist in the registry.
+   *
+   * This is useful to re-use the `TaggedHandler` directly.
+   *
+   * @example
+   * ```typescript
+   * export const helloRouter = RpcGroup.make(
+   *   Rpc.fromTaggedRequest(SayHelloReq),
+   *   Rpc.fromTaggedRequest(SayByeReq),
+   * );
+   *
+   * export const helloRequests = createRpcGroupRegistry().registerGetGroup('hello', helloRouter);
+   * ```
+   *
+   * It registers the hello group and returns it.
+   * Then you can do something like:
+   *
+   * @example
+   * ```typescript
+   * // in /app/api/route.ts, for example
+   * import { helloRequests } from './requests';
+   *
+   * const program = helloRequests.getRequest('SayHelloReq', { name });
+   * ```
+   * 
+   * This is shorter than just using `registerGroup` which would require to get the `hello` handlers first.
+   *
+   * @typeParam K - The unique tag for the handler group.
+   * @typeParam V - The handler group instance to register.
+   * @param tag - The unique identifier for the handler group. Must not already exist in the registry.
+   * @param handler - The handler group instance to register.
+   * @returns The {@link TaggedHandler} for the newly registered group.
+   */
+  registerGetGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
+    tag: K extends keyof T ? never : K,
+    handler: V,
+  ): TaggedHandler<
+    K extends keyof T ? never : K,
+    (T & Record<K, V>)[K extends keyof T ? never : K]
+  >;
+
+  /**
+   * Retrieves a registered handler group by its tag with full type safety.
+   *
+   * @typeParam K - The tag of the handler group to retrieve.
+   * @param tag - The tag associated with the desired handler group.
+   * @returns The {@link TaggedHandler} corresponding to the specified tag.
+   */
+  get<K extends keyof T & string>(tag: K): TaggedHandler<K, T[K]>;
+
+  /**
+   * Checks if a handler group exists for the specified tag.
+   *
+   * @typeParam K - The tag to check for existence.
+   * @param tag - The tag to check in the registry.
+   * @returns `true` if the handler group exists for the tag, otherwise `false`.
+   */
+  has<K extends string>(tag: K): tag is K & keyof T;
+
+  /**
+   * Retrieves all registered tags in the registry.
+   *
+   * @returns An array of all tags currently registered.
+   */
+  getTags(): (keyof T)[];
+};
+
+/**
  * Creates a type-safe handler registry that maintains exact type relationships.
  *
  * This is the recommended way to achieve full type safety. The registry uses a builder
@@ -120,15 +213,12 @@ export function createRpcGroupRegistry<
 >() {
   function createRegistryWithHandlers<T extends Record<RegistryKey, RpcGroup.RpcGroup<any>>>(
     handlers: T,
-  ) {
-    const registry = {
-      /**
-       * Register a new handler with the given tag
-       */
+  ): RpcGroupRegistry<T> {
+    const registry: RpcGroupRegistry<T> = {
       registerGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
         tag: K extends keyof T ? never : K,
         handler: V,
-      ) {
+      ): RpcGroupRegistry<T & Record<K, V>> {
         if (tag in handlers) {
           throw new Error(`RPC group with tag "${tag}" already exists`);
         }
@@ -139,14 +229,14 @@ export function createRpcGroupRegistry<
       registerGetGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
         tag: K extends keyof T ? never : K,
         handler: V,
-      ) {
+      ): TaggedHandler<
+        K extends keyof T ? never : K,
+        (T & Record<K, V>)[K extends keyof T ? never : K]
+      > {
         const a = registry.registerGroup(tag, handler);
         return a.get(tag);
       },
 
-      /**
-       * Get a handler by its tag with full type safety
-       */
       get<K extends keyof T & string>(tag: K): TaggedHandler<K, T[K]> {
         if (!(tag in handlers)) {
           throw new Error(`RPC group with tag "${String(tag)}" not found`);
@@ -158,16 +248,10 @@ export function createRpcGroupRegistry<
         return createTaggedHandler(tag, handler) as TaggedHandler<K, T[K]>;
       },
 
-      /**
-       * Check if a handler exists
-       */
       has<K extends string>(tag: K): tag is K & keyof T {
         return tag in handlers;
       },
 
-      /**
-       * Get all registered tags
-       */
       getTags(): (keyof T)[] {
         return Object.keys(handlers) as (keyof T)[];
       },
