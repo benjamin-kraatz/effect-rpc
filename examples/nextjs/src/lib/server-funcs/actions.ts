@@ -4,7 +4,7 @@ import { helloRequests } from '../rpc/hello/requests';
 import { AppRuntime } from '../runtime';
 
 export async function greetUserServerSide(name: string): Promise<string> {
-  // Use makeServerRequest for server-side RPC calls without HTTP
+  // Simply access the hello requests, select the name and pass its parameters.
   const program = helloRequests.getRequest('SayHelloReq', { name });
 
   try {

@@ -16,7 +16,7 @@ export const AppRuntime = ManagedRuntime.make(
 const sampleLayer = Layer.empty;
 export const AppRuntime2 = createRuntime({
   url: 'http://localhost:3000/api/hello',
-  serialization: RpcSerialization.layerMsgPack,
+  serialization: RpcSerialization.layerNdjson,
   additionalLayers: [
     sampleLayer, // any additional layers you want to merge
   ],
