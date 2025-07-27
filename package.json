@@ -6,10 +6,13 @@
     "check-types": "turbo check-types",
     "publish-package": "pnpm --filter effect-rpc publish",
     "example:nextjs": "turbo run example:nextjs && pnpm -F @effect-rpc/example-nextjs dev",
-    "example:tanstack": "turbo run example:tanstack && pnpm -F @effect-rpc/example-tanstack dev"
+    "example:tanstack": "turbo run example:tanstack && pnpm -F @effect-rpc/example-tanstack dev",
+    "ci:version": "changeset version",
+    "ci:publish": "changeset publish"
   },
   "packageManager": "pnpm@10.7.1",
   "devDependencies": {
+    "@changesets/cli": "^2.29.5",
     "turbo": "^2.5.5"
   }
 }
