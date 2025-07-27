@@ -55,6 +55,43 @@ export type TaggedRPCGroup<K extends RegistryKey, V extends RpcGroup.RpcGroup<an
     payload: Parameters<InferClient<V>[N]>[0],
   ) => ReturnType<InferClient<V>[N]>;
 
+  /**
+   * Creates a server handler for this RPC group.
+   *
+   * This method generates a handler function suitable for use in server environments
+   * (such as HTTP endpoints or serverless functions) that can process incoming requests
+   * and route them to the appropriate implementation based on the registered RPC group.
+   *
+   * @typeParam R - The environment type required by the request implementations.
+   * @param requestImplementations - An object mapping request names to their implementation functions.
+   *   Each implementation should match the signature expected by the corresponding request.
+   * @param config - Configuration options for the RPC handler, such as environment injection,
+   *   error handling, or custom response formatting.
+   * @returns A function that takes a `globalThis.Request` and an optional `Context`, and returns a `Promise<Response>`.
+   *
+   * @example
+   * ```typescript
+   * import { helloRequests } from './requests';
+   * import { HelloService } from './service';
+   * import { RpcSerialization } from '@effect/rpc';
+   * 
+   * const handler = helloRequests.createServerHandler(
+   *   {
+   *     SayByeReq: ({ name }) => HelloService.sayBye(name),
+   *     SayHelloReq: ({ name }) => HelloService.sayHello(name),
+   *   },
+   *   {
+   *     serviceLayers: HelloService.Default,
+   *     serialization: RpcSerialization.layerNdjson,
+   *   },
+   * );
+   *
+   * // Use in a server route
+   * export const POST = handler;
+   * ```
+   *
+   * @since 0.8.0
+   */
   createServerHandler: <R>(
     requestImplementations: RequestImplementations<V, InferClient<V>, R>,
     config: RPCHandlerConfig<R>,
@@ -202,7 +239,7 @@ export type RpcGroupRegistry<T extends Record<RegistryKey, RpcGroup.RpcGroup<any
  *
  * @returns A registry object with methods to register and retrieve groups with full type safety
  *
- * @example
+
  * ```typescript
  * // Create a registry and register groups
  * const registry = createRpcGroupRegistry()
