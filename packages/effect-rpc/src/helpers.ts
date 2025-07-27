@@ -17,7 +17,8 @@ export type SerializationLayer = Layer.Layer<RpcSerialization.RpcSerialization, 
 export type InferClient<T> = T extends RpcGroup.RpcGroup<infer R> ? RpcClient.RpcClient<R> : never;
 
 /**
- * Gets an RPC client for a specific request within a given RPC group.
+ * Makes a request for a specific request within a given RPC group.
+ * It builds up the request and executes it, returning the response.
  *
  * Reusable function for the client and the server.
  *
@@ -25,7 +26,7 @@ export type InferClient<T> = T extends RpcGroup.RpcGroup<infer R> ? RpcClient.Rp
  * @param requestName - The name of the request to get the client for.
  * @returns A function that takes the request payload and returns the response.
  */
-export function getRPCClient<
+export function makeRPCRequest<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends RpcGroup.RpcGroup<any>,
   K extends keyof InferClient<T>,
