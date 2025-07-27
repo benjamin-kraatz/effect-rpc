@@ -1,6 +1,7 @@
 import { FetchHttpClient, HttpServer } from '@effect/platform';
 import { RpcClient, RpcSerialization } from '@effect/rpc';
 import * as Layer from 'effect/Layer';
+import * as Schema from 'effect/Schema';
 import type { SerializationLayer } from './helpers';
 import { ManagedRuntime } from 'effect';
 
@@ -199,4 +200,115 @@ export function getServerLayers(
     HttpServer.layerContext,
     ...(config.additionalLayers ?? []),
   );
+}
+
+/**
+ * Creates an array of tagged requests for RPC communication for a given namespace tag.
+ * It allows you to globally register requests to re-use them across your application,
+ * for example, when you do actual requests to the server with the RPC client.
+ *
+ * **NOTE**: requests are stored globally in memory, and the {@link tag} _must_ be unique.
+ * If you create requests with the same tag, it will throw an error.
+ * Best practice is to use an import-path-style string, such as `@/main/MyRequests`,
+ * or the file path of the file where the requests are defined.
+ *
+ * For type safety with makeRequest, consider augmenting the GlobalRequestRegistry:
+ *
+ * @example
+ * ```typescript
+ * declare module "effect-rpc" {
+ *   interface GlobalRequestRegistry {
+ *     "@/hello/SayHelloRequests": "SayHelloReq" | "SayByeReq";
+ *   }
+ * }
+ *
+ * const requests = createRequests("@/hello/SayHelloRequests", [SayHelloReq, SayByeReq]);
+ * // Now makeRequest("@/hello/SayHelloRequests", "SayHelloReq") is type-safe
+ * ```
+ *
+ * @param tag - The tag to identify the requests.
+ * @param requests - The array of requests to create.
+ * @returns An array of tagged requests.
+ * @throws Error if a request with the same tag already exists in the global request mapping.
+ *
+ * @since 0.7.0
+ */
+export function createRequests<R, E, I>(tag: string, requests: R[]): TaggedRequest<R>[] {
+  for (const request of requests) {
+    if (__globalRequestMapping.has(tag)) {
+      throw new Error(`Request already exists in request mapping "${tag}"`);
+    }
+    __globalRequestMapping.set(tag, [
+      ...(__globalRequestMapping.get(tag) ?? []),
+      request as TaggedRequest<R>,
+    ]);
+  }
+
+  return __globalRequestMapping.get(tag) as TaggedRequest<R>[];
+}
+
+type TaggedRequest<R> = {
+  [K in keyof R]: R[K] extends Schema.TaggedRequest<
+    infer Tag,
+    infer A,
+    infer I,
+    infer R0,
+    infer SuccessType,
+    infer SuccessEncoded,
+    infer FailureType,
+    infer FailureEncoded,
+    infer ResultR
+  >
+    ? Schema.TaggedRequest<
+        Tag,
+        A,
+        I,
+        R0,
+        SuccessType,
+        SuccessEncoded,
+        FailureType,
+        FailureEncoded,
+        ResultR
+      >
+    : never;
+};
+
+const __globalRequestMapping = new Map<string, TaggedRequest<any>[]>();
+
+/**
+ * Global registry interface for mapping tags to their request names.
+ * This allows for type-safe request names in makeRequest.
+ *
+ * Users should augment this interface with string literal types representing their request names:
+ *
+ * @example
+ * ```typescript
+ * declare module "effect-rpc" {
+ *   interface GlobalRequestRegistry {
+ *     "@/hello/SayHelloRequests": "SayHelloReq" | "SayByeReq";
+ *   }
+ * }
+ * ```
+ */
+export interface GlobalRequestRegistry {
+  // This will be augmented by module declaration merging
+}
+
+/**
+ * Gets the valid request names for a given tag.
+ * If the tag exists in GlobalRequestRegistry, returns the union of request names.
+ * Otherwise, falls back to string.
+ */
+type RequestNamesForTag<Tag extends string> = Tag extends keyof GlobalRequestRegistry
+  ? GlobalRequestRegistry[Tag]
+  : string;
+
+export async function makeRequest<Tag extends string>(
+  tag: Tag,
+  requestName: RequestNamesForTag<Tag>,
+) {
+  const mapping = __globalRequestMapping.get(tag);
+  if (!mapping) {
+    throw new Error(`No requests found for tag "${tag}"`);
+  }
 }
