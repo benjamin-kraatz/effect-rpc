@@ -281,16 +281,3 @@ export function makeServerRequest<
   const request = getRPCClient(rpcGroup, requestName);
   return request(payload);
 }
-
-/**
- * This is a dummy function that does nothing.
- * It will be removed in the next path version.
- * 
- * @deprecated This function is a placeholder and should not be used.
- * It will be removed in the next minor version.
- * 
- * Used to verify changesets and versioning work in this monorepo.
- */
-export function dummyFunc() {
-  //
-}
