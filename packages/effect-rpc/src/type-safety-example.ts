@@ -24,15 +24,18 @@ export const helloRouter = RpcGroup.make(
 
 // NEW APPROACH: Create a type-safe registry (no module augmentation needed!)
 const handlerRegistry = createHandlerRegistry()
-  .register('flamingo', helloRouter);
+  .register('flamingo', helloRouter)
+  .register('kerze', helloRouter);
 
 // Step 1: Get handlers with full type safety!
 const retrievedHelloHandler = handlerRegistry.get('flamingo');
+
+const retrieveCandleHandler = handlerRegistry.get('kerze');
 //    ^ Type: RpcGroup.RpcGroup<Rpc.From<typeof SayHelloReq> | Rpc.From<typeof SayByeReq>>
 //           (NOT RpcGroup.RpcGroup<any>!)
 
 // Step 2: TypeScript will catch typos and invalid tags at compile time
-// const invalidHandler = handlerRegistry.get('typo'); 
+// const invalidHandler = handlerRegistry.get('typo');
 //       ^ TypeScript Error: Argument of type '"typo"' is not assignable to parameter of type '"flamingo"'
 
 // Step 3: Check if handler exists with type narrowing
