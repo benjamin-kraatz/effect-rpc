@@ -1,5 +1,5 @@
-import { RpcGroup } from "@effect/rpc";
-import { getRPCClient, type InferClient } from "./helpers";
+import { RpcGroup } from '@effect/rpc';
+import { getRPCClient, type InferClient } from './helpers';
 
 /**
  * Creates a function to perform an RPC request using the provided RPC group and request name.
@@ -29,12 +29,10 @@ import { getRPCClient, type InferClient } from "./helpers";
 export function useRPCRequest<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends RpcGroup.RpcGroup<any>,
-  K extends keyof InferClient<T>
+  K extends keyof InferClient<T>,
 >(
   rpcGroup: T,
-  requestName: K
-): (
-  payload: Parameters<InferClient<T>[K]>[0]
-) => ReturnType<InferClient<T>[K]> {
+  requestName: K,
+): (payload: Parameters<InferClient<T>[K]>[0]) => ReturnType<InferClient<T>[K]> {
   return getRPCClient(rpcGroup, requestName);
 }

@@ -35,6 +35,7 @@
   "scripts": {
     "prebuild": "cp ../../README.md .",
     "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
     "docs:gen": "typedoc --out ../docs/public --router kind-dir --entryPointStrategy expand src --skipErrorChecking --exclude \"**/*.test.ts\"",
     "docs:deploy": "cd ../docs && flyctl deploy",
     "check-types": "tsc --noEmit",

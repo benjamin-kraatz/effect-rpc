@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { RpcGroup, RpcSerialization, RpcServer } from "@effect/rpc";
-import type { Context } from "@effect/rpc/Rpc";
-import { Effect, Layer } from "effect";
-import {
-  getRPCClient,
-  type InferClient,
-  type SerializationLayer,
-} from "./helpers";
-import { getServerLayers } from "./runtime";
+import { RpcGroup, RpcSerialization, RpcServer } from '@effect/rpc';
+import type { Context } from '@effect/rpc/Rpc';
+import { Effect, Layer } from 'effect';
+import { getRPCClient, type InferClient, type SerializationLayer } from './helpers';
+import { getServerLayers } from './runtime';
 
 /**
  * Creates a web-compatible handler for your RPC router and effectful service layer.
@@ -44,25 +40,19 @@ import { getServerLayers } from "./runtime";
  * @deprecated Use {@link createRPCHandler} for a more streamlined approach that combines route handler creation and server setup.
  * This function is kept for backward compatibility but will be turned into an internal utility in the next minor version.
  */
-export function createServerHandler<
-  T extends RpcGroup.RpcGroup<any>,
-  Routes = ExtractRoutes<T>,
->(
+export function createServerHandler<T extends RpcGroup.RpcGroup<any>, Routes = ExtractRoutes<T>>(
   router: T,
   rpcHandler: Layer.Layer<Routes, never, never>,
   serialization: SerializationLayer = RpcSerialization.layerNdjson,
   ...additionalLayers: Layer.Layer<any, any, never>[]
-): (
-  request: globalThis.Request,
-  context?: Context<never> | undefined
-) => Promise<Response> {
+): (request: globalThis.Request, context?: Context<never> | undefined) => Promise<Response> {
   const { handler } = RpcServer.toWebHandler(router, {
     layer: Layer.mergeAll(
       rpcHandler,
       getServerLayers({
         serialization,
       }),
-      ...additionalLayers
+      ...additionalLayers,
     ),
   });
 
@@ -88,8 +78,7 @@ type ExtractError<T> = T extends Effect.Effect<any, infer E, any> ? E : never;
  *
  * @internal
  */
-type ExtractRoutes<T> =
-  T extends RpcGroup.RpcGroup<infer Routes> ? Routes : never;
+type ExtractRoutes<T> = T extends RpcGroup.RpcGroup<infer Routes> ? Routes : never;
 
 /**
  * Maps each RPC request to its implementation.
@@ -97,18 +86,10 @@ type ExtractRoutes<T> =
  *
  * @internal
  */
-type RequestImplementations<
-  T extends RpcGroup.RpcGroup<any>,
-  V extends InferClient<T>,
-  R,
-> = {
+type RequestImplementations<T extends RpcGroup.RpcGroup<any>, V extends InferClient<T>, R> = {
   readonly [P in keyof V]: (
-    payload: Parameters<V[P]>[0]
-  ) => Effect.Effect<
-    ExtractSuccess<ReturnType<V[P]>>,
-    ExtractError<ReturnType<V[P]>>,
-    R
-  >;
+    payload: Parameters<V[P]>[0],
+  ) => Effect.Effect<ExtractSuccess<ReturnType<V[P]>>, ExtractError<ReturnType<V[P]>>, R>;
 };
 
 /**
@@ -142,14 +123,10 @@ type RequestImplementations<
  * @deprecated Use {@link createRPCHandler} for a more streamlined approach that combines route handler creation and server setup.
  * This function is kept for backward compatibility but will be turned into an internal utility in the next minor version.
  */
-export function createRouteHandler<
-  T extends RpcGroup.RpcGroup<any>,
-  V extends InferClient<T>,
-  R,
->(
+export function createRouteHandler<T extends RpcGroup.RpcGroup<any>, V extends InferClient<T>, R>(
   router: T,
   reqImplementations: RequestImplementations<T, V, R>,
-  additionalLayers: Layer.Layer<R>
+  additionalLayers: Layer.Layer<R>,
 ): Layer.Layer<ExtractRoutes<T>, never, never> {
   // Transform the implementations to automatically provide the additional layers
   const transformedImplementations: Record<
@@ -159,9 +136,7 @@ export function createRouteHandler<
 
   for (const [key, impl] of Object.entries(reqImplementations)) {
     transformedImplementations[key] = (payload: unknown) => {
-      const effect = (impl as (payload: unknown) => Effect.Effect<any, any, R>)(
-        payload
-      );
+      const effect = (impl as (payload: unknown) => Effect.Effect<any, any, R>)(payload);
       // Automatically provide the additional layers to each implementation
       return effect.pipe(Effect.provide(additionalLayers));
     };
@@ -169,9 +144,11 @@ export function createRouteHandler<
 
   // We need to cast here because the router.toLayer expects exact types
   // but we're transforming the context requirements
-  return router.toLayer(
-    transformedImplementations as any
-  ) as unknown as Layer.Layer<ExtractRoutes<T>, never, never>;
+  return router.toLayer(transformedImplementations as any) as unknown as Layer.Layer<
+    ExtractRoutes<T>,
+    never,
+    never
+  >;
 }
 
 /**
@@ -203,11 +180,7 @@ export function createRouteHandler<
  *
  * @since 0.3.0
  */
-export function createRPCHandler<
-  T extends RpcGroup.RpcGroup<any>,
-  V extends InferClient<T>,
-  R,
->(
+export function createRPCHandler<T extends RpcGroup.RpcGroup<any>, V extends InferClient<T>, R>(
   router: T,
   reqImplementations: RequestImplementations<T, V, R>,
   config: {
@@ -231,21 +204,14 @@ export function createRPCHandler<
      * This is optional and can be omitted or an empty array if no additional layers are needed.
      */
     additionalLayers?: Layer.Layer<any, any, never>[];
-  }
-): (
-  request: globalThis.Request,
-  context?: Context<never> | undefined
-) => Promise<Response> {
-  const routeHandlers = createRouteHandler(
-    router,
-    reqImplementations,
-    config.serviceLayers
-  );
+  },
+): (request: globalThis.Request, context?: Context<never> | undefined) => Promise<Response> {
+  const routeHandlers = createRouteHandler(router, reqImplementations, config.serviceLayers);
   return createServerHandler(
     router,
     routeHandlers,
     config.serialization,
-    ...(config.additionalLayers || [])
+    ...(config.additionalLayers || []),
   );
 }
 
@@ -274,10 +240,11 @@ export function createRPCHandler<
  *
  * @since 0.3.0
  */
-export function makeServerRequest<
-  T extends RpcGroup.RpcGroup<any>,
-  K extends keyof InferClient<T>,
->(rpcGroup: T, requestName: K, payload: Parameters<InferClient<T>[K]>[0]) {
+export function makeServerRequest<T extends RpcGroup.RpcGroup<any>, K extends keyof InferClient<T>>(
+  rpcGroup: T,
+  requestName: K,
+  payload: Parameters<InferClient<T>[K]>[0],
+) {
   const request = getRPCClient(rpcGroup, requestName);
   return request(payload);
 }

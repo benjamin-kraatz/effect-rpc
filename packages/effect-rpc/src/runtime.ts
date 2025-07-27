@@ -1,7 +1,7 @@
-import { FetchHttpClient, HttpServer } from "@effect/platform";
-import { RpcClient, RpcSerialization } from "@effect/rpc";
-import * as Layer from "effect/Layer";
-import type { SerializationLayer } from "./helpers";
+import { FetchHttpClient, HttpServer } from '@effect/platform';
+import { RpcClient, RpcSerialization } from '@effect/rpc';
+import * as Layer from 'effect/Layer';
+import type { SerializationLayer } from './helpers';
 
 /**
  * Creates an RPC backend layer using HTTP protocol.
@@ -29,10 +29,7 @@ import type { SerializationLayer } from "./helpers";
  *
  * @deprecated Use {@link createEffectRPC} instead. It does the same thing, but with a more descriptive name.
  */
-export function makeRPCBackendLayer(config: {
-  url: string;
-  endpoint?: string;
-}) {
+export function makeRPCBackendLayer(config: { url: string; endpoint?: string }) {
   return createEffectRPC(config);
 }
 
@@ -84,13 +81,13 @@ export function createEffectRPC(config: {
   serialization?: SerializationLayer;
 }): Layer.Layer<RpcClient.Protocol, never, never> {
   return RpcClient.layerProtocolHttp({
-    url: `${config.url}${config.endpoint ?? ""}`,
+    url: `${config.url}${config.endpoint ?? ''}`,
   }).pipe(
     Layer.provide([
       // use fetch for http requests
       FetchHttpClient.layer,
       config.serialization ?? RpcSerialization.layerNdjson,
-    ])
+    ]),
   );
 }
 
@@ -145,12 +142,12 @@ export function getServerLayers(
   config: {
     serialization?: SerializationLayer;
     additionalLayers?: Layer.Layer<any, any, never>[];
-  } = { additionalLayers: [] }
+  } = { additionalLayers: [] },
 ) {
   return Layer.mergeAll(
     config.serialization ?? RpcSerialization.layerNdjson,
     FetchHttpClient.layer,
     HttpServer.layerContext,
-    ...(config.additionalLayers ?? [])
+    ...(config.additionalLayers ?? []),
   );
 }
