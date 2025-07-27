@@ -298,25 +298,3 @@ export function registerHandler<K extends RegistryKey, V extends RpcGroup.RpcGro
 
   return taggedHandler;
 }
-
-/**
- * Retrieves a registered handler from the global registry.
- *
- * Note: For full type safety, consider using `createHandlerRegistry()` instead.
- * This global retrieval approach provides runtime functionality but limited type safety.
- *
- * @param name The tag of the handler to retrieve
- * @returns The tagged handler
- *
- * @example
- * ```typescript
- * const handler = getHandler('flamingo');
- * ```
- */
-// export function getHandler<K extends string>(name: K): TaggedHandler<K, RpcGroup.RpcGroup<any>> {
-//   const handler = __globalRegistry.get(name);
-//   if (!handler) {
-//     throw new Error(`RPC group with tag "${name}" not found`);
-//   }
-//   return handler;
-// }
