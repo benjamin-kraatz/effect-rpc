@@ -132,14 +132,13 @@ export type RpcGroupRegistry<T extends Record<RegistryKey, RpcGroup.RpcGroup<any
    * It registers the hello group and returns it.
    * Then you can do something like:
    *
-   * @example
    * ```typescript
    * // in /app/api/route.ts, for example
    * import { helloRequests } from './requests';
    *
    * const program = helloRequests.getRequest('SayHelloReq', { name });
    * ```
-   * 
+   *
    * This is shorter than just using `registerGroup` which would require to get the `hello` handlers first.
    *
    * @typeParam K - The unique tag for the handler group.
@@ -261,40 +260,4 @@ export function createRpcGroupRegistry<
   }
 
   return createRegistryWithHandlers({} as T);
-}
-
-/**
- * Registers a new `RpcGroup` with the given tag in the global registry.
- *
- * Note: For full type safety, consider using `createHandlerRegistry()` instead.
- * This global registration approach provides runtime functionality but limited type safety.
- *
- * @param tag The unique tag for the handler
- * @param handler The RPC group handler to register
- * @returns The registered tagged handler
- *
- * @example
- * ```typescript
- * const helloRouter = RpcGroup.make(
- *   Rpc.fromTaggedRequest(SayHelloReq),
- *   Rpc.fromTaggedRequest(SayByeReq),
- * );
- *
- * const flamingoHandler = registerHandler('flamingo', helloRouter);
- * ```
- *
- * @since 0.8.0
- */
-export function registerHandler<K extends RegistryKey, V extends RpcGroup.RpcGroup<any>>(
-  tag: K,
-  handler: V,
-): TaggedHandler<K, V> {
-  if (__globalRegistry.has(tag)) {
-    throw new Error(`RPC group with tag "${tag}" already exists`);
-  }
-
-  const taggedHandler = createTaggedHandler(tag, handler);
-  __globalRegistry.set(tag, taggedHandler);
-
-  return taggedHandler;
 }
